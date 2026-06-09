@@ -274,3 +274,29 @@ Ana ekran:
 ## 20. Ürünün Tek Cümlelik Başarı Tanımı
 
 Turkuaz ClickFlow, kullanıcının tekrar eden mouse ve klavye işlemlerini güvenli, kontrollü ve ayarlanabilir hızda otomatik olarak gerçekleştirmesini sağlamalıdır.
+
+## Platform Kararı
+
+Turkuaz ClickFlow hem Windows hem macOS üzerinde çalışacak şekilde tasarlanacaktır.
+
+MVP hedefi:
+
+- Windows desteği
+- macOS için temel uyumluluk hazırlığı
+
+Ürün mimarisinde mouse, klavye ve pencere işlemleri platforma özel adapter yapısıyla ayrılacaktır.
+
+Windows ve macOS aynı arayüzü kullanacak; ancak pencere listeleme, global kısayol ve otomatik tıklama işlemleri işletim sistemine göre ayrı uygulanacaktır.
+
+## Ürün Sahibi Kararı
+
+Turkuaz ClickFlow hem Windows hem macOS destekleyecek şekilde tasarlanacaktır.
+
+Kod mimarisinde platforma özel işlemler adapter yapısına ayrılmalıdır:
+
+- Windows adapter
+- macOS adapter
+
+Ortak ürün mantığı, sayaç, durum makinesi ve UI platformdan bağımsız olmalıdır.
+
+İlk geliştirme Windows odaklı yapılabilir; ancak macOS desteği mimaride baştan düşünülmelidir.
