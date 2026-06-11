@@ -4,6 +4,7 @@ Bu klasor tamamlanan gorevleri tutar. Her dosyanin basinda kapanis ozeti bulunma
 
 ## Tamamlanan Gorevler
 
+- BUG-001 — CPS UI Reset
 - TASK-002 — Ana Yuzey Bilgi Mimarisi
 - TASK-003 — Hiz Ayari Kurallari
 - TASK-004 — Sol Tiklama Motoru, domain temeli kismi tamamlandi
@@ -21,6 +22,7 @@ Bu klasor tamamlanan gorevleri tutar. Her dosyanin basinda kapanis ozeti bulunma
 - TASK-018 — OS Global Hotkey Adapter
 - TASK-019 — Windows Real Mouse Backend
 - TASK-020 — UI ClickRunner Calisma Dongusu Baglantisi
+- TASK-022 — macOS Real Mouse Backend
 
 ## Son Test Durumu
 
@@ -28,4 +30,4 @@ Bu klasor tamamlanan gorevleri tutar. Her dosyanin basinda kapanis ozeti bulunma
 PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
 
-Sonuc: 92 test basarili.
+Sonuc: 106 test basarili.

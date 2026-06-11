@@ -21,6 +21,7 @@ Sprint-1: Windows odakli minimum auto clicker cekirdegi ve macOS uyumluluk hazir
 
 ## Tamamlanan Sprint-1 Gorevleri
 
+- BUG-001 — CPS UI Reset
 - TASK-002 — Ana Yuzey Bilgi Mimarisi
 - TASK-003 — Hiz Ayari Kurallari
 - TASK-004 — Sol Tiklama Motoru, domain temeli kismi tamamlandi
@@ -38,15 +39,32 @@ Sprint-1: Windows odakli minimum auto clicker cekirdegi ve macOS uyumluluk hazir
 - TASK-018 — OS Global Hotkey Adapter
 - TASK-019 — Windows Real Mouse Backend
 - TASK-020 — UI ClickRunner Calisma Dongusu Baglantisi
+- TASK-022 — macOS Real Mouse Backend
 
 ## Devam Eden / Kalan Sprint-1 Gorevleri
 
 - TASK-001 — MVP Kabul Cercevesi
 - TASK-021 — Windows MVP Manuel Smoke Test
 
+## Açık Buglar
+
+Yok.
+
+## Çözülen Buglar
+
+- BUG-001 — CPS degeri UI'da 10'a geri donuyordu. ViewModel secili CPS degerini koruyacak sekilde guncellendi.
+
 ## MVP Kapanis Durumu
 
 MVP kabul edilmedi; revizyon gereklidir. TASK-012 kapsam kapanis kontrolu, Windows uctan uca manuel smoke test eksik oldugu icin MVP'nin henuz ilk kullanilabilir auto clicker olarak kapanamayacagini kaydetmistir.
+
+TASK-021 mevcut `darwin` ortaminda calistirilamaz. Windows manuel smoke test sonucu beklenmektedir.
+
+BUG-001 cozuldu. MVP release karari icin Windows manuel smoke test sonucu beklenmektedir.
+
+PM Brain V2 aktif hale getirildi. Product Owner, QA ve Release Agent rolleri
+AGENTS.md icinde tanimlandi. Health, risk, manual validation ve release status
+dosyalari olusturuldu.
 
 Tamamlanan temel gelistirici gorevleri:
 
@@ -58,6 +76,7 @@ Tamamlanan temel gelistirici gorevleri:
 - TASK-018 — OS Global Hotkey Adapter
 - TASK-019 — Windows Real Mouse Backend
 - TASK-020 — UI ClickRunner Calisma Dongusu Baglantisi
+- TASK-022 — macOS Real Mouse Backend
 
 Yeni bloklayici revizyon gorevleri:
 
@@ -76,8 +95,17 @@ Son unit test sonucu:
 PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
 
-Sonuc: 92 test basarili.
+Sonuc: 106 test basarili.
 
 ## Sonraki Onerilen Task
 
 TASK-021 — Windows MVP Manuel Smoke Test.
+
+## PM Brain V2 Dosyalari
+
+- `.brain/health_report.md`
+- `.brain/open_risks.md`
+- `.brain/manual_validation.md`
+- `.brain/release_status.md`
+- `tasks/user-tests/`
+- `reviews/product-review-2026-06-11.md`

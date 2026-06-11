@@ -11,6 +11,7 @@ TASK-012 kapanis kontrolu sonrasi durum:
 - ClickRunner app katmaninda test edilebilir sekilde olusturulmustur.
 - UI Start / Stop ve F8 akisi ClickRunner calisma dongusune baglanmistir.
 - Windows mouse backend'i TASK-019 ile gercek `SendInput` backend'ine alinmistir; Windows disi ortamda guvenli unavailable backend davranisi vardir.
+- macOS mouse backend'i TASK-022 ile gercek Quartz backend'ine alinmistir; Accessibility veya Input Monitoring izni gerekebilir.
 - Gercek OS davranisi Windows smoke testte dogrulanmalidir.
 
 Bu nedenle senaryolar ikiye ayrilmistir:

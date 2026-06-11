@@ -25,6 +25,7 @@ kabul edilebilmesi için gerçek tıklama üretimi ve UI üzerinden kesintisiz
 - Platform adapter arayüzleri.
 - ClickRunner'ın bounded/test edilebilir tıklama adımları.
 - Windows global hotkey adapter'ın backend üzerinden F8 callback routing'i.
+- macOS Quartz mouse backend'i.
 
 ## Bloklayıcı Eksikler
 
@@ -101,7 +102,7 @@ manuel doğrulanmış değildir:
 PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
 
-Sonuç: 92 test başarılı.
+Sonuç: 99 test başarılı.
 
 ## Ürün Sahibi Kararı İçin Öneri
 

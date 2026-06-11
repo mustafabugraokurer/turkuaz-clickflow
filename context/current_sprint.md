@@ -48,6 +48,7 @@ Sprint-1 çıktısı; kullanıcının varsayılan `F8` kısayolu veya Start / St
 
 ### Done
 
+- BUG-001 — CPS UI Reset
 - TASK-002 — Ana Yüzey Bilgi Mimarisini Tanımla
 - TASK-003 — Hız Ayarı Kurallarını Tanımla
 - TASK-004 — Sol Tıklama Motorunu Planla ve Geliştir, domain temeli kısmi tamamlandı
@@ -65,6 +66,7 @@ Sprint-1 çıktısı; kullanıcının varsayılan `F8` kısayolu veya Start / St
 - TASK-018 — OS Global Hotkey Adapter
 - TASK-019 — Windows Real Mouse Backend
 - TASK-020 — UI ClickRunner Çalışma Döngüsü Bağlantısı
+- TASK-022 — macOS Real Mouse Backend
 
 ### Todo
 
@@ -79,7 +81,13 @@ TASK-021 — Windows MVP Manuel Smoke Test
 
 TASK-012 tamamlandı ve MVP kabul edilmedi. Gerçek MVP kapanışı için Windows uçtan uca manuel smoke test tamamlanmalıdır.
 
-Sıradaki bloklayıcı revizyon görevi TASK-021'dir.
+Windows MVP kapanışı için bloklayıcı revizyon görevi TASK-021'dir.
+
+Mevcut çalışma ortamı `darwin` olduğu için TASK-021 burada yürütülemez; Windows üzerinde manuel smoke test beklenmektedir.
+
+macOS gerçek mouse backend'i TASK-022 ile tamamlanmıştır.
+
+BUG-001 CPS UI reset problemi çözülmüştür. Seçilen CPS refresh sırasında korunur.
 
 ## Sprint-1 Dışı / Opsiyonel
 

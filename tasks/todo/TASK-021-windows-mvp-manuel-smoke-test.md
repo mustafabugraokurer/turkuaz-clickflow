@@ -1,5 +1,14 @@
 # TASK-021 — Windows MVP Manuel Smoke Test
 
+## Blokaj Notu
+
+Durum: Windows ortamı bekleniyor.
+
+Bu görev gerçek Windows OS davranışı gerektirir. Mevcut çalışma ortamı
+`darwin` olduğu için manuel smoke test yürütülemedi. Hazır test sonucu ve
+uygulanacak adımlar `tests/manual/windows-mvp-smoke-test-result.md` dosyasına
+yazıldı.
+
 ## Epic
 
 EPIC-06 — MVP Kalite ve Kabul

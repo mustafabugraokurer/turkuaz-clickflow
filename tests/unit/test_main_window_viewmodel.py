@@ -51,6 +51,33 @@ class MainWindowViewModelTest(unittest.TestCase):
             "Çalışıyor. Durdurmak için Stop'a basın veya F8 kullanın.",
         )
 
+    def test_cps_selection_is_preserved_before_start(self) -> None:
+        view_model = MainWindowViewModel(
+            automation_service=AutomationService(),
+            feedback_service=FeedbackService(),
+        )
+
+        changed = view_model.set_cps(25)
+        refreshed = view_model.snapshot()
+
+        self.assertEqual(changed.cps, 25)
+        self.assertEqual(refreshed.cps, 25)
+        self.assertEqual(view_model.selected_cps, 25)
+
+    def test_start_uses_and_preserves_selected_cps(self) -> None:
+        automation = AutomationService()
+        view_model = MainWindowViewModel(
+            automation_service=automation,
+            feedback_service=FeedbackService(),
+        )
+        view_model.set_cps(25)
+
+        snapshot = view_model.start(cps=view_model.selected_cps)
+
+        self.assertEqual(automation.settings.cps, 25)
+        self.assertEqual(snapshot.cps, 25)
+        self.assertEqual(view_model.snapshot().cps, 25)
+
     def test_stop_command_uses_automation_service(self) -> None:
         automation = AutomationService()
         view_model = MainWindowViewModel(
@@ -70,6 +97,20 @@ class MainWindowViewModelTest(unittest.TestCase):
             snapshot.message,
             "Durdu. Son durma sebebi: Kullanıcı durdurdu.",
         )
+
+    def test_stop_preserves_selected_cps_for_next_run(self) -> None:
+        automation = AutomationService()
+        view_model = MainWindowViewModel(
+            automation_service=automation,
+            feedback_service=FeedbackService(),
+        )
+        view_model.set_cps(30)
+        view_model.start(cps=view_model.selected_cps)
+
+        snapshot = view_model.stop()
+
+        self.assertEqual(snapshot.cps, 30)
+        self.assertEqual(view_model.snapshot().cps, 30)
 
     def test_invalid_cps_start_returns_user_message(self) -> None:
         automation = AutomationService()

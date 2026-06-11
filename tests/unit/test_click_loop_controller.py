@@ -39,8 +39,20 @@ class FakeMouse:
 
 
 class FailingMouse:
+    def __init__(self, message: str = "click failed") -> None:
+        self._message = message
+
     def left_click(self) -> None:
-        raise PlatformOperationError("click failed")
+        raise PlatformOperationError(self._message)
+
+
+class BrokenRunner:
+    def run_once(self):
+        raise RuntimeError("runner exploded")
+
+    @property
+    def click_interval_seconds(self) -> float:
+        return 0.1
 
 
 class ClickLoopControllerTest(unittest.TestCase):
@@ -117,7 +129,11 @@ class ClickLoopControllerTest(unittest.TestCase):
         )
         controller.sync_with_automation()
 
-        result = controller.tick()
+        with self.assertLogs(
+            "turkuaz_clickflow.app.click_loop_controller",
+            level="ERROR",
+        ) as logs:
+            result = controller.tick()
 
         self.assertTrue(result.stopped)
         self.assertEqual(result.stop_reason, StopReason.ERROR)
@@ -126,8 +142,91 @@ class ClickLoopControllerTest(unittest.TestCase):
         self.assertEqual(automation.state, AutomationState.STOPPED)
         self.assertEqual(
             feedback_messages,
-            ["Hata nedeniyle durdu. Lütfen tekrar deneyin."],
+            ["Tıklama başlatılamadı: click failed"],
         )
+        self.assertIn("Click runner stopped with error: click failed", logs.output[0])
+
+    def test_runner_permission_error_emits_macos_permission_message(self) -> None:
+        automation = AutomationService()
+        automation.start(cps=10)
+        feedback_messages = []
+        controller = ClickLoopController(
+            automation_service=automation,
+            click_runner=ClickRunner(
+                automation,
+                FailingMouse("macOS Accessibility or Input Monitoring permission is required"),
+            ),
+            scheduler=FakeScheduler(),
+            feedback_service=FeedbackService(),
+            on_feedback=lambda message: feedback_messages.append(message.text),
+        )
+
+        with self.assertLogs(
+            "turkuaz_clickflow.app.click_loop_controller",
+            level="ERROR",
+        ):
+            controller.tick()
+
+        self.assertEqual(
+            feedback_messages,
+            ["macOS erişilebilirlik izni gerekli olabilir."],
+        )
+        self.assertEqual(automation.counter.value, 0)
+
+    def test_runner_unavailable_backend_emits_platform_message(self) -> None:
+        automation = AutomationService()
+        automation.start(cps=10)
+        feedback_messages = []
+        controller = ClickLoopController(
+            automation_service=automation,
+            click_runner=ClickRunner(
+                automation,
+                FailingMouse("macOS mouse API is not available"),
+            ),
+            scheduler=FakeScheduler(),
+            feedback_service=FeedbackService(),
+            on_feedback=lambda message: feedback_messages.append(message.text),
+        )
+
+        with self.assertLogs(
+            "turkuaz_clickflow.app.click_loop_controller",
+            level="ERROR",
+        ):
+            controller.tick()
+
+        self.assertEqual(
+            feedback_messages,
+            ["Bu platformda tıklama backend'i kullanılamıyor."],
+        )
+        self.assertEqual(automation.counter.value, 0)
+
+    def test_unhandled_runner_exception_is_logged_and_stops_safely(self) -> None:
+        automation = AutomationService()
+        automation.start(cps=10)
+        feedback_messages = []
+        controller = ClickLoopController(
+            automation_service=automation,
+            click_runner=BrokenRunner(),
+            scheduler=FakeScheduler(),
+            feedback_service=FeedbackService(),
+            on_feedback=lambda message: feedback_messages.append(message.text),
+        )
+
+        with self.assertLogs(
+            "turkuaz_clickflow.app.click_loop_controller",
+            level="ERROR",
+        ) as logs:
+            result = controller.tick()
+
+        self.assertTrue(result.stopped)
+        self.assertEqual(result.successful_clicks, 0)
+        self.assertEqual(automation.state, AutomationState.STOPPED)
+        self.assertEqual(automation.counter.value, 0)
+        self.assertEqual(
+            feedback_messages,
+            ["Tıklama başlatılamadı: runner exploded"],
+        )
+        self.assertIn("Unhandled click runner exception: runner exploded", logs.output[0])
 
 
 if __name__ == "__main__":

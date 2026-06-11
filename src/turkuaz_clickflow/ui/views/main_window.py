@@ -91,6 +91,7 @@ class MainWindow(QMainWindow):
     def _connect_signals(self) -> None:
         self.start_button.clicked.connect(self._handle_start)
         self.stop_button.clicked.connect(self._handle_stop)
+        self.cps_input.valueChanged.connect(self._handle_cps_changed)
 
     def _handle_start(self) -> None:
         self._apply_snapshot(self._view_model.start(cps=self.cps_input.value()))
@@ -99,6 +100,9 @@ class MainWindow(QMainWindow):
     def _handle_stop(self) -> None:
         self._apply_snapshot(self._view_model.stop())
         self._sync_click_loop()
+
+    def _handle_cps_changed(self, cps: int) -> None:
+        self._view_model.set_cps(cps)
 
     def sync_after_external_automation_change(self) -> None:
         """Refresh UI and click loop after OS hotkey callbacks."""
@@ -179,7 +183,9 @@ class MainWindow(QMainWindow):
         self.title_label.setText(snapshot.title)
         self.status_label.setText(f"Durum: {self._localize_status(snapshot.status)}")
         self.hotkey_label.setText(f"Kısayol: {snapshot.hotkey}")
+        self.cps_input.blockSignals(True)
         self.cps_input.setValue(snapshot.cps)
+        self.cps_input.blockSignals(False)
         self._sync_target_window(snapshot.target_window)
         self.window_guard_checkbox.setChecked(snapshot.window_guard_enabled)
         self.click_count_label.setText(str(snapshot.click_count))
@@ -216,15 +222,18 @@ class QTimerClickLoopScheduler:
 
     def __init__(self) -> None:
         self._timer = QTimer()
+        self._callback: Optional[Callable[[], None]] = None
 
     def start(self, interval_ms: int, callback: Callable[[], None]) -> None:
         self._timer.stop()
-        try:
-            self._timer.timeout.disconnect()
-        except RuntimeError:
-            pass
+        if self._callback is not None:
+            try:
+                self._timer.timeout.disconnect(self._callback)
+            except RuntimeError:
+                pass
         self._timer.setInterval(interval_ms)
         self._timer.timeout.connect(callback)
+        self._callback = callback
         self._timer.start()
 
     def stop(self) -> None:

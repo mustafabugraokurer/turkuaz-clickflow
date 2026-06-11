@@ -7,6 +7,7 @@ from turkuaz_clickflow.app.automation_service import AutomationService
 from turkuaz_clickflow.app.feedback_service import FeedbackMessage, FeedbackService
 from turkuaz_clickflow.app.hotkey_service import HotkeyResult, HotkeyService
 from turkuaz_clickflow.domain.automation_state import AutomationState
+from turkuaz_clickflow.domain.cps_policy import CpsPolicy
 from turkuaz_clickflow.domain.stop_reason import StopReason
 
 
@@ -41,10 +42,24 @@ class MainWindowViewModel:
         self._feedback_service = feedback_service
         self._hotkey_service = hotkey_service or HotkeyService(automation_service)
         self._last_feedback: Optional[FeedbackMessage] = None
+        self._selected_cps = automation_service.settings.cps
+
+    @property
+    def selected_cps(self) -> int:
+        """CPS value selected by the user for the next run."""
+        return self._selected_cps
+
+    def set_cps(self, cps: int) -> MainWindowSnapshot:
+        """Store the user's CPS selection without starting automation."""
+        CpsPolicy().validate(cps)
+        self._selected_cps = cps
+        return self.snapshot()
 
     def start(self, cps: int) -> MainWindowSnapshot:
         """Start automation through the app service and return refreshed UI state."""
         result = self._automation_service.start(cps=cps)
+        if result.accepted:
+            self._selected_cps = self._automation_service.settings.cps
         self._last_feedback = self._feedback_service.for_automation_result(result)
         return self.snapshot()
 
@@ -75,10 +90,11 @@ class MainWindowViewModel:
         settings = self._automation_service.settings
         feedback = self._resolve_feedback()
         state = self._automation_service.state
+        displayed_cps = settings.cps if state is AutomationState.RUNNING else self._selected_cps
         return MainWindowSnapshot(
             title="Turkuaz ClickFlow",
             status=state.value,
-            cps=settings.cps,
+            cps=displayed_cps,
             hotkey=settings.hotkey,
             click_count=self._automation_service.counter.value,
             elapsed_time=self._format_elapsed(self._automation_service.elapsed_seconds),
