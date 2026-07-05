@@ -8,12 +8,16 @@ gerekirse bug veya task olusturulur.
 
 ## Bekleyen User Tests
 
-- USER-TEST-001 — CPS Validation
-- USER-TEST-002 — Hotkey Validation
-- USER-TEST-003 — Platform Validation
-- USER-TEST-004 — macOS Permission Validation
+- USER-TEST-001 - CPS Validation
+- USER-TEST-002 - Hotkey Validation
+- USER-TEST-003 - Platform Validation
+- USER-TEST-004 - macOS Permission Validation
 
-## Sonuc Formatı
+## Tamamlanan User Tests
+
+- USER-TEST-WIN-001 - Windows MVP Smoke Validation
+
+## Sonuc Formati
 
 Her user-test sonucu su bilgileri icermelidir:
 

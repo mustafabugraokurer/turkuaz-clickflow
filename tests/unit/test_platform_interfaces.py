@@ -31,7 +31,7 @@ class PlatformInterfacesTest(unittest.TestCase):
         self.assertEqual(adapter.name, "windows")
         self.assertTrue(adapter.capabilities.mouse_click)
         self.assertTrue(adapter.capabilities.global_hotkey)
-        self.assertFalse(adapter.capabilities.window_query)
+        self.assertTrue(adapter.capabilities.window_query)
 
     def test_create_platform_adapter_returns_macos_shell(self) -> None:
         adapter = create_platform_adapter("darwin")

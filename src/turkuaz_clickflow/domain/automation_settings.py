@@ -12,6 +12,7 @@ class AutomationSettings:
 
     cps: int = CpsPolicy().default
     hotkey: str = "F8"
+    target_window_id: Optional[str] = None
     target_window: Optional[str] = None
     window_guard_enabled: bool = False
 

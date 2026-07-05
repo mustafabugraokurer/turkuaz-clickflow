@@ -101,6 +101,23 @@ class GlobalHotkeyControllerTest(unittest.TestCase):
 
         self.assertEqual(adapter.unregistered_hotkey, "F8")
 
+    def test_trigger_callback_exception_does_not_break_hotkey_toggle(self) -> None:
+        automation = AutomationService()
+        adapter = FakeHotkeyAdapter()
+        controller = GlobalHotkeyController(
+            adapter=adapter,
+            hotkey_service=HotkeyService(automation),
+            feedback_service=FeedbackService(),
+            on_trigger=lambda result: (_ for _ in ()).throw(RuntimeError("ui failed")),
+        )
+        controller.register()
+
+        adapter.trigger()
+        adapter.trigger()
+
+        self.assertEqual(automation.state, AutomationState.STOPPED)
+        self.assertEqual(automation.stop_reason, StopReason.HOTKEY_STOPPED)
+
 
 if __name__ == "__main__":
     unittest.main()

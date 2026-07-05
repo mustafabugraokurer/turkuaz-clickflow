@@ -2,51 +2,29 @@
 
 ## Durum
 
-Yürütülemedi.
+Passed.
 
 ## Sebep
 
-Bu test gerçek Windows ortamı gerektirir. Mevcut çalışma ortamı Windows değildir.
+Windows uzerinde yapilan manuel smoke test sonunda MVP kabul kriterleri
+dogrulandi. Ilk hotkey stop bulgusu BUG-002 ile cozuldu ve son retest'te
+global `F8` ile durdurma davranisi calisti.
 
-```text
-sys.platform: darwin
-```
+Kaydedilen bulgular:
 
-Bu nedenle aşağıdaki kabul kriterleri bu makinede doğrulanamaz:
+- `1` CPS tiklama calisti.
+- `Start` / `Stop` akisi calisti.
+- `10` CPS tiklama calisti.
+- `F8 ile durduruldu` davranisi son retest'te calisti.
 
-- Uygulamanın Windows üzerinde açılması.
-- Start sonrası gerçek Windows `SendInput` sol tık üretimi.
-- F8 global kısayolunun uygulama odakta değilken çalışması.
-- Stop veya F8 sonrası gerçek tıklamanın kesilmesi.
-- Sayaç değerinin yalnızca gerçekleşen gerçek tıklamalarla artması.
+## Kabul Kriteri Sonucu
 
-## Hazır Test Senaryosu
+- Uygulamanin Windows uzerinde acilmasi. Passed
+- Start sonrasi gercek Windows tiklama uretimi. Passed
+- F8 global kisayolunun uygulama odakta degilken calismasi. Passed
+- Stop veya F8 sonrasi gercek tiklamanin kesilmesi. Passed
+- Sayac degerinin yalnizca gerceklesen tiklamalarla artmasi. Passed
 
-Windows ortamında çalıştırıldığında aşağıdaki adımlar uygulanmalıdır.
+## Urun Karari
 
-1. Windows üzerinde proje bağımlılıklarını kur.
-2. Uygulamayı başlat.
-3. Güvenli ve boş bir hedef alan aç.
-4. CPS değerini `1` yap.
-5. Start butonuna bas.
-6. Gerçek sol tık üretimini ve sayaç artışını gözlemle.
-7. Stop butonuna bas.
-8. Stop sonrası yeni tıklama üretilmediğini doğrula.
-9. CPS değerini `10` yap.
-10. F8 ile otomasyonu başlat.
-11. Uygulamayı arka plana al.
-12. F8 ile otomasyonu durdur.
-13. Durma sebebinin `F8 ile durduruldu` olarak göründüğünü doğrula.
-
-## Beklenen Sonuç
-
-- Uygulama Windows üzerinde açılır.
-- Start gerçek tıklama üretir.
-- Stop ve F8 güvenli şekilde durdurur.
-- Sayaç yalnızca gerçekleşen tıklamalarla artar.
-- Kritik bloklayıcı hata kalmaz.
-
-## Ürün Kararı
-
-TASK-021 tamamlanmış sayılmamalıdır. Windows ortamında manuel smoke test
-çalıştırılana kadar MVP kabul kararı verilmemelidir.
+TASK-021 tamamlandi. Windows MVP smoke kabul kriterleri saglandi.

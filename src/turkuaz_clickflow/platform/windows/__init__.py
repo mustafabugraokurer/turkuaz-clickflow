@@ -3,15 +3,16 @@
 from dataclasses import dataclass, field
 
 from turkuaz_clickflow.platform.interfaces import PlatformCapabilities
-from turkuaz_clickflow.platform.unsupported import (
-    UnsupportedWindowQueryAdapter,
-)
 from turkuaz_clickflow.platform.windows.hotkey import (
     WindowsGlobalHotkeyAdapter,
     create_windows_hotkey_backend,
 )
 from turkuaz_clickflow.platform.windows.mouse import WindowsMouseClickAdapter
 from turkuaz_clickflow.platform.windows.mouse import create_windows_mouse_backend
+from turkuaz_clickflow.platform.windows.window_query import (
+    WindowsWindowQueryAdapter,
+    create_windows_window_query_backend,
+)
 
 
 @dataclass(frozen=True)
@@ -22,7 +23,7 @@ class WindowsPlatformAdapter:
     capabilities: PlatformCapabilities = PlatformCapabilities(
         mouse_click=True,
         global_hotkey=True,
-        window_query=False,
+        window_query=True,
     )
     mouse: WindowsMouseClickAdapter = field(
         default_factory=lambda: WindowsMouseClickAdapter(create_windows_mouse_backend())
@@ -32,6 +33,8 @@ class WindowsPlatformAdapter:
             create_windows_hotkey_backend()
         )
     )
-    windows: UnsupportedWindowQueryAdapter = field(
-        default_factory=UnsupportedWindowQueryAdapter
+    windows: WindowsWindowQueryAdapter = field(
+        default_factory=lambda: WindowsWindowQueryAdapter(
+            create_windows_window_query_backend()
+        )
     )

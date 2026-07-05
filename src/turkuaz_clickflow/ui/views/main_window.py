@@ -92,6 +92,10 @@ class MainWindow(QMainWindow):
         self.start_button.clicked.connect(self._handle_start)
         self.stop_button.clicked.connect(self._handle_stop)
         self.cps_input.valueChanged.connect(self._handle_cps_changed)
+        self.target_window_select.currentIndexChanged.connect(
+            self._handle_target_window_changed
+        )
+        self.window_guard_checkbox.toggled.connect(self._handle_window_guard_toggled)
 
     def _handle_start(self) -> None:
         self._apply_snapshot(self._view_model.start(cps=self.cps_input.value()))
@@ -103,6 +107,14 @@ class MainWindow(QMainWindow):
 
     def _handle_cps_changed(self, cps: int) -> None:
         self._view_model.set_cps(cps)
+
+    def _handle_target_window_changed(self, index: int) -> None:
+        item_data = self.target_window_select.itemData(index)
+        window_id = None if item_data in (None, "") else str(item_data)
+        self._apply_snapshot(self._view_model.select_target_window(window_id))
+
+    def _handle_window_guard_toggled(self, enabled: bool) -> None:
+        self._apply_snapshot(self._view_model.set_window_guard_enabled(enabled))
 
     def sync_after_external_automation_change(self) -> None:
         """Refresh UI and click loop after OS hotkey callbacks."""
@@ -186,8 +198,11 @@ class MainWindow(QMainWindow):
         self.cps_input.blockSignals(True)
         self.cps_input.setValue(snapshot.cps)
         self.cps_input.blockSignals(False)
+        self._sync_target_window_options(snapshot.available_target_windows)
         self._sync_target_window(snapshot.target_window)
+        self.window_guard_checkbox.blockSignals(True)
         self.window_guard_checkbox.setChecked(snapshot.window_guard_enabled)
+        self.window_guard_checkbox.blockSignals(False)
         self.click_count_label.setText(str(snapshot.click_count))
         self.elapsed_time_label.setText(snapshot.elapsed_time)
         self.message_label.setText(snapshot.message)
@@ -199,12 +214,28 @@ class MainWindow(QMainWindow):
         if self._click_loop_controller is not None:
             self._click_loop_controller.sync_with_automation()
 
+    def _sync_target_window_options(self, options: tuple[object, ...]) -> None:
+        current_data = self.target_window_select.currentData()
+        self.target_window_select.blockSignals(True)
+        self.target_window_select.clear()
+        self.target_window_select.addItem("Seçilmedi", "")
+        for window in options:
+            self.target_window_select.addItem(window.title, window.id)
+        if current_data not in (None, ""):
+            index = self.target_window_select.findData(current_data)
+            if index >= 0:
+                self.target_window_select.setCurrentIndex(index)
+        self.target_window_select.blockSignals(False)
+
     def _sync_target_window(self, target_window: str) -> None:
+        self.target_window_select.blockSignals(True)
         index = self.target_window_select.findText(target_window, Qt.MatchFixedString)
         if index == -1:
-            self.target_window_select.addItem(target_window)
+            data = "" if target_window == "Seçilmedi" else target_window
+            self.target_window_select.addItem(target_window, data)
             index = self.target_window_select.findText(target_window, Qt.MatchFixedString)
         self.target_window_select.setCurrentIndex(index)
+        self.target_window_select.blockSignals(False)
 
     @staticmethod
     def _localize_status(status: str) -> str:

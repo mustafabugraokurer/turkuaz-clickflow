@@ -4,10 +4,15 @@ from __future__ import annotations
 
 import sys
 import threading
+import time
+import logging
 from dataclasses import dataclass
 from typing import Callable, Dict, Optional, Protocol
 
 from turkuaz_clickflow.platform.interfaces import PlatformOperationError
+
+
+logger = logging.getLogger(__name__)
 
 
 class WindowsHotkeyBackend(Protocol):
@@ -38,6 +43,7 @@ class WindowsHotkeySpec:
 class WindowsGlobalHotkeyAdapter:
     """Registers global hotkeys through a Windows backend."""
 
+    _MOD_NOREPEAT = 0x4000
     _SUPPORTED_KEYS = {"F8": 0x77}
 
     def __init__(
@@ -88,7 +94,7 @@ class WindowsGlobalHotkeyAdapter:
             raise PlatformOperationError(f"Unsupported Windows hotkey: {hotkey}")
         return WindowsHotkeySpec(
             label=normalized,
-            modifiers=0,
+            modifiers=cls._MOD_NOREPEAT,
             virtual_key=virtual_key,
         )
 
@@ -110,11 +116,13 @@ class UnavailableWindowsHotkeyBackend:
 
 
 class WindowsUser32HotkeyBackend:
-    """RegisterHotKey backend with a background message loop."""
+    """Windows hotkey backend using global key-state polling."""
 
-    WM_HOTKEY = 0x0312
-
-    def __init__(self, user32: Optional[object] = None) -> None:
+    def __init__(
+        self,
+        user32: Optional[object] = None,
+        poll_interval_seconds: float = 0.01,
+    ) -> None:
         if user32 is None:
             if sys.platform != "win32":
                 raise PlatformOperationError(
@@ -125,8 +133,12 @@ class WindowsUser32HotkeyBackend:
             user32 = ctypes.windll.user32
         self._user32 = user32
         self._callbacks: Dict[int, Callable[[], None]] = {}
+        self._virtual_keys: Dict[int, int] = {}
+        self._pressed_ids: set[int] = set()
         self._lock = threading.Lock()
         self._listener: Optional[threading.Thread] = None
+        self._listener_ready = threading.Event()
+        self._poll_interval_seconds = poll_interval_seconds
 
     def register(
         self,
@@ -135,24 +147,32 @@ class WindowsUser32HotkeyBackend:
         virtual_key: int,
         callback: Callable[[], None],
     ) -> None:
-        if not self._user32.RegisterHotKey(None, hotkey_id, modifiers, virtual_key):
-            raise PlatformOperationError("RegisterHotKey failed")
+        del modifiers
         with self._lock:
             self._callbacks[hotkey_id] = callback
+            self._virtual_keys[hotkey_id] = virtual_key
+            self._pressed_ids.discard(hotkey_id)
         self._ensure_listener()
 
     def unregister(self, hotkey_id: int) -> None:
         with self._lock:
             self._callbacks.pop(hotkey_id, None)
-        if not self._user32.UnregisterHotKey(None, hotkey_id):
-            raise PlatformOperationError("UnregisterHotKey failed")
+            self._virtual_keys.pop(hotkey_id, None)
+            self._pressed_ids.discard(hotkey_id)
 
     def dispatch(self, hotkey_id: int) -> None:
         """Dispatch a hotkey callback. Public for backend unit tests."""
         with self._lock:
             callback = self._callbacks.get(hotkey_id)
         if callback is not None:
-            callback()
+            try:
+                callback()
+            except Exception as exc:
+                logger.exception(
+                    "Windows hotkey callback failed for hotkey_id=%s: %s",
+                    hotkey_id,
+                    exc,
+                )
 
     def _ensure_listener(self) -> None:
         if self._listener is not None and self._listener.is_alive():
@@ -163,15 +183,28 @@ class WindowsUser32HotkeyBackend:
             daemon=True,
         )
         self._listener.start()
+        self._listener_ready.wait()
 
     def _message_loop(self) -> None:
-        import ctypes
-        from ctypes import wintypes
+        self._listener_ready.set()
+        while True:
+            with self._lock:
+                tracked_keys = tuple(self._virtual_keys.items())
 
-        msg = wintypes.MSG()
-        while self._user32.GetMessageW(ctypes.byref(msg), None, 0, 0) != 0:
-            if msg.message == self.WM_HOTKEY:
-                self.dispatch(int(msg.wParam))
+            for hotkey_id, virtual_key in tracked_keys:
+                is_pressed = bool(self._user32.GetAsyncKeyState(int(virtual_key)) & 0x8000)
+                should_dispatch = False
+                with self._lock:
+                    was_pressed = hotkey_id in self._pressed_ids
+                    if is_pressed and not was_pressed:
+                        self._pressed_ids.add(hotkey_id)
+                        should_dispatch = hotkey_id in self._callbacks
+                    elif not is_pressed and was_pressed:
+                        self._pressed_ids.discard(hotkey_id)
+                if should_dispatch:
+                    self.dispatch(hotkey_id)
+
+            time.sleep(self._poll_interval_seconds)
 
 
 def create_windows_hotkey_backend() -> WindowsHotkeyBackend:

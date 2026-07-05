@@ -4,7 +4,22 @@ from turkuaz_clickflow.app.automation_service import AutomationService
 from turkuaz_clickflow.app.feedback_service import FeedbackService
 from turkuaz_clickflow.domain.automation_state import AutomationState
 from turkuaz_clickflow.domain.stop_reason import StopReason
+from turkuaz_clickflow.platform.interfaces import WindowInfo
 from turkuaz_clickflow.ui.viewmodels.main_window_viewmodel import MainWindowViewModel
+
+
+class StubWindowQueryAdapter:
+    def __init__(self, windows=None) -> None:
+        self._windows = list(windows or [])
+
+    def list_windows(self):
+        return list(self._windows)
+
+    def active_window(self):
+        return self._windows[0] if self._windows else None
+
+    def set_windows(self, windows) -> None:
+        self._windows = list(windows)
 
 
 class MainWindowViewModelTest(unittest.TestCase):
@@ -22,6 +37,7 @@ class MainWindowViewModelTest(unittest.TestCase):
         self.assertEqual(snapshot.hotkey, "F8")
         self.assertEqual(snapshot.click_count, 0)
         self.assertEqual(snapshot.elapsed_time, "00:00:00")
+        self.assertEqual(snapshot.available_target_windows, ())
         self.assertEqual(snapshot.target_window, "Seçilmedi")
         self.assertFalse(snapshot.window_guard_enabled)
         self.assertEqual(
@@ -31,6 +47,55 @@ class MainWindowViewModelTest(unittest.TestCase):
         self.assertEqual(snapshot.message_level, "info")
         self.assertTrue(snapshot.start_enabled)
         self.assertFalse(snapshot.stop_enabled)
+
+    def test_snapshot_exposes_available_target_windows(self) -> None:
+        adapter = StubWindowQueryAdapter(
+            [
+                WindowInfo(id="1", title="Untitled - Notepad"),
+                WindowInfo(id="2", title="Calculator"),
+            ]
+        )
+        view_model = MainWindowViewModel(
+            automation_service=AutomationService(),
+            feedback_service=FeedbackService(),
+            window_query=adapter,
+        )
+
+        snapshot = view_model.snapshot()
+
+        self.assertEqual(
+            snapshot.available_target_windows,
+            (
+                WindowInfo(id="1", title="Untitled - Notepad"),
+                WindowInfo(id="2", title="Calculator"),
+            ),
+        )
+
+    def test_select_target_window_updates_next_run_selection(self) -> None:
+        adapter = StubWindowQueryAdapter([WindowInfo(id="1", title="Untitled - Notepad")])
+        view_model = MainWindowViewModel(
+            automation_service=AutomationService(),
+            feedback_service=FeedbackService(),
+            window_query=adapter,
+        )
+
+        snapshot = view_model.select_target_window("1")
+
+        self.assertEqual(snapshot.target_window, "Untitled - Notepad")
+
+    def test_missing_selected_target_window_falls_back_to_unselected(self) -> None:
+        adapter = StubWindowQueryAdapter([WindowInfo(id="1", title="Untitled - Notepad")])
+        view_model = MainWindowViewModel(
+            automation_service=AutomationService(),
+            feedback_service=FeedbackService(),
+            window_query=adapter,
+        )
+        view_model.select_target_window("1")
+        adapter.set_windows([])
+
+        snapshot = view_model.snapshot()
+
+        self.assertEqual(snapshot.target_window, "Seçilmedi")
 
     def test_start_command_uses_automation_service(self) -> None:
         automation = AutomationService()
@@ -50,6 +115,23 @@ class MainWindowViewModelTest(unittest.TestCase):
             snapshot.message,
             "Çalışıyor. Durdurmak için Stop'a basın veya F8 kullanın.",
         )
+
+    def test_start_carries_selected_target_window_into_settings(self) -> None:
+        automation = AutomationService()
+        adapter = StubWindowQueryAdapter([WindowInfo(id="1", title="Untitled - Notepad")])
+        view_model = MainWindowViewModel(
+            automation_service=automation,
+            feedback_service=FeedbackService(),
+            window_query=adapter,
+        )
+        view_model.select_target_window("1")
+        view_model.set_window_guard_enabled(True)
+
+        view_model.start(cps=12)
+
+        self.assertEqual(automation.settings.target_window_id, "1")
+        self.assertEqual(automation.settings.target_window, "Untitled - Notepad")
+        self.assertTrue(automation.settings.window_guard_enabled)
 
     def test_cps_selection_is_preserved_before_start(self) -> None:
         view_model = MainWindowViewModel(

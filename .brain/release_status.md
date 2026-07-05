@@ -2,29 +2,29 @@
 
 ## Current Recommendation
 
-No-Go
+Go
 
 ## Release Readiness Score
 
-78%
+90%
 
 ## Neden
 
-Windows uzerinde uctan uca manuel smoke test tamamlanmamistir.
+Windows uzerinde uctan uca manuel smoke test Passed sonuc verdi ve BUG-002
+kapatildi. Ana release blockerlar kalmadi.
 
 ## Go Icin Minimum Kosullar
 
-- TASK-021 Windows MVP Manuel Smoke Test tamamlanmali.
-- Start / Stop / F8 / CPS / sayac / sure Windows ortaminda dogrulanmali.
-- Kritik release blocker bug kalmamali.
+- Start / Stop / F8 / CPS / sayac / sure Windows ortaminda dogrulanmali. Passed
+- Kritik release blocker bug kalmamali. Passed
 
 ## Platform Durumu
 
 ### Windows
 
-Durum: Release candidate'a yakin, manuel smoke test bekliyor.
+Durum: Windows MVP icin release candidate hazir.
 
-Readiness: 70%
+Readiness: 92%
 
 Hazir olanlar:
 
@@ -32,10 +32,12 @@ Hazir olanlar:
 - UI ClickRunner dongusu
 - F8 global hotkey adapter
 - CPS UI reset bug fix
+- Hedef pencere listeleme ve secimi
+- `Start` / `Stop`, `1` CPS, `10` CPS ve `F8` manuel olarak dogrulandi
 
 Eksik:
 
-- Windows manuel smoke test sonucu
+- Packaging / installer
 
 ### macOS
 
@@ -57,18 +59,19 @@ Eksik:
 
 ## Open Release Blockers
 
-- TASK-021 — Windows MVP Manuel Smoke Test
+Yok.
 
 ## Decision Engine Next Action
 
-TASK-021 — Windows MVP Manuel Smoke Test
+RELEASE REVIEW
 
 Gerekce:
 
-- High severity risk: Windows smoke test eksik.
-- Acik bug yok.
-- Release No-Go sebebi Windows manuel dogrulama eksigi.
+- High severity Windows blocker kapandi.
+- Kullanici smoke testi Passed sonuc verdi.
+- Siradaki mantikli aksiyon release gozden gecirmesidir.
 
 ## Recently Resolved
 
-- BUG-001 — CPS UI Reset
+- BUG-001 - CPS UI Reset
+- BUG-002 - Windows F8 ile durdurma calismiyor

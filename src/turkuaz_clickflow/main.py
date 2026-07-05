@@ -15,6 +15,7 @@ from turkuaz_clickflow.ui.viewmodels.main_window_viewmodel import MainWindowView
 
 def main(argv: Optional[List[str]] = None) -> int:
     """Start the PySide6 MVP main window."""
+    from PySide6.QtCore import QObject, Signal
     from PySide6.QtWidgets import QApplication
 
     from turkuaz_clickflow.ui.views.main_window import (
@@ -23,6 +24,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
 
     app = QApplication(sys.argv if argv is None else argv)
+
+    class HotkeyResultBridge(QObject):
+        triggered = Signal(object)
+
     platform_adapter = create_platform_adapter()
     automation_service = AutomationService()
     feedback_service = FeedbackService()
@@ -31,6 +36,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         automation_service=automation_service,
         feedback_service=feedback_service,
         hotkey_service=hotkey_service,
+        window_query=platform_adapter.windows,
     )
     window_holder = {}
     click_runner = ClickRunner(
@@ -45,17 +51,20 @@ def main(argv: Optional[List[str]] = None) -> int:
         on_feedback=view_model.show_feedback,
         on_update=lambda: window_holder["window"].refresh(),
     )
+    hotkey_bridge = HotkeyResultBridge()
 
     def handle_hotkey_trigger(result) -> None:
         view_model.show_hotkey_result(result)
         click_loop_controller.sync_with_automation()
         window_holder["window"].refresh()
 
+    hotkey_bridge.triggered.connect(handle_hotkey_trigger)
+
     hotkey_controller = GlobalHotkeyController(
         adapter=platform_adapter.hotkeys,
         hotkey_service=hotkey_service,
         feedback_service=feedback_service,
-        on_trigger=handle_hotkey_trigger,
+        on_trigger=hotkey_bridge.triggered.emit,
     )
     window = MainWindow(
         view_model,

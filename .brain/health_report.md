@@ -4,27 +4,23 @@
 
 Sprint-1: Windows odakli minimum auto clicker cekirdegi ve macOS uyumluluk hazirligi.
 
-## Health Score Calculation
-
-Bu dosya karar motoru olarak kullanilir. Skorlar release blocker, test, platform
-hazirligi ve manuel dogrulama durumuna gore guncellenir.
-
 ## Sprint Progress
 
-88%
+97%
 
 Gerekce:
 
 - Cekirdek gelistirme gorevleri tamamlandi.
-- Windows manuel smoke test bekleniyor.
+- Windows MVP smoke testi Passed sonuc verdi.
+- Eski release blocker olan BUG-002 kapatildi.
 - TASK-001 tarihsel planlama kalintisi olarak duruyor.
 
 ## Test Count
 
-106 unit test basarili.
+118 unit test basarili.
 
 ```bash
-PYTHONPATH=src python3 -m unittest discover -s tests/unit
+PYTHONPATH=src python -m unittest discover -s tests/unit
 ```
 
 ## Open Bugs
@@ -33,62 +29,53 @@ Yok.
 
 ## Open Tasks
 
-- TASK-001 — MVP Kabul Cercevesi
-- TASK-021 — Windows MVP Manuel Smoke Test
-- TASK-007 — Pencere Listeleme ve Hedef Secimi
-- TASK-008 — Pencere Degisince Durdurma Davranisi
+- TASK-001 - MVP Kabul Cercevesi
+- TASK-008 - Pencere Degisince Durdurma Davranisi
 
 ## Release Readiness
 
-78%
+90%
 
-Karar: No-Go
+Karar: Go
 
 Gerekce:
 
-- Acik bug yok.
-- 106 unit test basarili.
-- Windows uzerinde uctan uca manuel smoke test tamamlanmadi.
+- Acik release blocker bug yok.
+- 118 unit test basarili.
+- Windows uzerinde uctan uca manuel smoke test Passed sonuc verdi.
 
 ## Platform Readiness
 
-- Windows: 70%
-  - Real mouse backend var.
-  - Global F8 adapter var.
-  - Manuel Windows smoke test bekleniyor.
+- Windows: 92%
+- Real mouse backend var.
+- Global F8 hotkey akisi manuel olarak dogrulandi.
+- `Start` / `Stop`, `1` CPS ve `10` CPS manuel olarak dogrulandi.
+- Hedef pencere listeleme ve secimi var.
 - macOS: 85%
-  - Real mouse backend var.
-  - Global hotkey adapter yok.
-  - Accessibility/Input Monitoring izin deneyimi manuel dogrulanmali.
+- Real mouse backend var.
+- Global hotkey adapter yok.
+- Accessibility/Input Monitoring izin deneyimi manuel dogrulanmali.
 
 ## Suggested User Tests
 
-- USER-TEST-001 — CPS Validation
-- USER-TEST-002 — Hotkey Validation
-- USER-TEST-003 — Platform Validation
-- USER-TEST-004 — macOS Permission Validation
+- USER-TEST-001 - CPS Validation
+- USER-TEST-002 - Hotkey Validation
+- USER-TEST-003 - Platform Validation
+- USER-TEST-004 - macOS Permission Validation
 
 ## Suggested New Tasks
 
-- TASK-021 — Windows MVP Manuel Smoke Test
-- TASK-024 — macOS Global Hotkey Adapter
-- TASK-025 — Packaging Strategy
-- TASK-026 — Settings Persistence
-- TASK-027 — macOS Permission UX Review
+- TASK-008 - Pencere Degisince Durdurma Davranisi
+- TASK-024 - macOS Global Hotkey Adapter
+- TASK-025 - Packaging Strategy
+- TASK-026 - Settings Persistence
+- TASK-027 - macOS Permission UX Review
 
 ## Suggested Next Action
 
-TASK-021 — Windows MVP Manuel Smoke Test
+RELEASE REVIEW
 
 ## Decision Rationale
 
-Release No-Go durumunun ana nedeni Windows smoke test eksigidir. Bu nedenle
-devam et komutu geldiginde karar motoru once TASK-021'i secer. Mevcut ortam
-Windows degilse TASK-021 blocked kalir ve siradaki mantikli aksiyon macOS
-permission validation veya macOS global hotkey task'i olur.
-
-## Release Status
-
-No-Go.
-
-Release icin Windows manuel smoke test sonucu beklenmektedir.
+Windows MVP icin ana release blockerlar kapandi. Bu nedenle en mantikli sonraki
+aksiyon yeni bir bug degil, release gozden gecirmesidir.

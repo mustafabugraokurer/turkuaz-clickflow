@@ -1,9 +1,13 @@
 import unittest
+from threading import current_thread
 
 from turkuaz_clickflow.platform.interfaces import PlatformOperationError
 from turkuaz_clickflow.platform.registry import create_platform_adapter
 from turkuaz_clickflow.platform.windows import WindowsPlatformAdapter
-from turkuaz_clickflow.platform.windows.hotkey import WindowsGlobalHotkeyAdapter
+from turkuaz_clickflow.platform.windows.hotkey import (
+    WindowsGlobalHotkeyAdapter,
+    WindowsUser32HotkeyBackend,
+)
 
 
 class FakeWindowsHotkeyBackend:
@@ -28,6 +32,17 @@ class FailingWindowsHotkeyBackend:
         raise RuntimeError("UnregisterHotKey failed")
 
 
+class FakeUser32PollingBackend:
+    def __init__(self) -> None:
+        self.key_states = {}
+
+    def GetAsyncKeyState(self, virtual_key: int) -> int:
+        return 0x8000 if self.key_states.get(virtual_key, False) else 0
+
+    def set_pressed(self, virtual_key: int, pressed: bool) -> None:
+        self.key_states[virtual_key] = pressed
+
+
 class WindowsHotkeyAdapterTest(unittest.TestCase):
     def test_windows_hotkey_adapter_registers_f8_virtual_key(self) -> None:
         backend = FakeWindowsHotkeyBackend()
@@ -37,7 +52,7 @@ class WindowsHotkeyAdapterTest(unittest.TestCase):
         adapter.register("F8", lambda: calls.append("triggered"))
         backend.callback()
 
-        self.assertEqual(backend.registered, [(1, 0, 0x77)])
+        self.assertEqual(backend.registered, [(1, 0x4000, 0x77)])
         self.assertEqual(calls, ["triggered"])
 
     def test_windows_hotkey_adapter_unregisters_registered_hotkey(self) -> None:
@@ -60,6 +75,70 @@ class WindowsHotkeyAdapterTest(unittest.TestCase):
 
         with self.assertRaises(PlatformOperationError):
             adapter.register("F8", lambda: None)
+
+    def test_user32_backend_registers_and_dispatches_on_listener_thread(self) -> None:
+        backend = FakeUser32PollingBackend()
+        hotkey_backend = WindowsUser32HotkeyBackend(user32=backend, poll_interval_seconds=0.001)
+        callbacks = []
+
+        hotkey_backend.register(
+            1,
+            0x4000,
+            0x77,
+            lambda: callbacks.append(current_thread().name),
+        )
+        backend.set_pressed(0x77, True)
+
+        for _ in range(50):
+            if callbacks:
+                break
+            import time
+
+            time.sleep(0.01)
+
+        self.assertTrue(callbacks)
+        self.assertEqual(callbacks[0], "turkuaz-clickflow-hotkey-listener")
+
+    def test_user32_backend_unregister_stops_future_dispatch(self) -> None:
+        backend = FakeUser32PollingBackend()
+        hotkey_backend = WindowsUser32HotkeyBackend(user32=backend, poll_interval_seconds=0.001)
+        calls = []
+
+        hotkey_backend.register(1, 0x4000, 0x77, lambda: calls.append("called"))
+        hotkey_backend.unregister(1)
+        backend.set_pressed(0x77, True)
+
+        import time
+
+        time.sleep(0.02)
+
+        self.assertEqual(calls, [])
+
+    def test_user32_backend_survives_callback_exception_and_dispatches_again(self) -> None:
+        backend = FakeUser32PollingBackend()
+        hotkey_backend = WindowsUser32HotkeyBackend(user32=backend, poll_interval_seconds=0.001)
+        calls = []
+
+        def flaky_callback() -> None:
+            calls.append("called")
+            if len(calls) == 1:
+                raise RuntimeError("boom")
+
+        hotkey_backend.register(1, 0x4000, 0x77, flaky_callback)
+        backend.set_pressed(0x77, True)
+        import time
+        time.sleep(0.02)
+        backend.set_pressed(0x77, False)
+        time.sleep(0.02)
+        backend.set_pressed(0x77, True)
+
+        for _ in range(50):
+            if len(calls) >= 2:
+                break
+
+            time.sleep(0.01)
+
+        self.assertEqual(calls, ["called", "called"])
 
     def test_windows_platform_adapter_exposes_global_hotkey_capability(self) -> None:
         adapter = WindowsPlatformAdapter(

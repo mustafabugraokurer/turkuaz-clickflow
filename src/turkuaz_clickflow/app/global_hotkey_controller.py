@@ -1,6 +1,7 @@
 """App-level binding between OS hotkey adapters and HotkeyService."""
 
 from dataclasses import dataclass
+import logging
 from typing import Callable, Optional
 
 from turkuaz_clickflow.app.feedback_service import FeedbackMessage, FeedbackService
@@ -9,6 +10,8 @@ from turkuaz_clickflow.platform.interfaces import (
     GlobalHotkeyAdapter,
     PlatformOperationError,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -84,4 +87,7 @@ class GlobalHotkeyController:
             self._hotkey_service.hotkey
         )
         if self._on_trigger is not None:
-            self._on_trigger(self._last_hotkey_result)
+            try:
+                self._on_trigger(self._last_hotkey_result)
+            except Exception as exc:
+                logger.exception("Hotkey trigger callback failed: %s", exc)
