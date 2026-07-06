@@ -2,25 +2,27 @@
 
 ## Sprint
 
-Sprint-1: Windows odakli minimum auto clicker cekirdegi ve macOS uyumluluk hazirligi.
+Sprint-2: macOS readiness, izin deneyimi ve urunlesme hazirligi.
 
 ## Sprint Progress
 
-97%
+100%
 
 Gerekce:
 
-- Cekirdek gelistirme gorevleri tamamlandi.
-- Windows MVP smoke testi Passed sonuc verdi.
-- Eski release blocker olan BUG-002 kapatildi.
-- TASK-001 tarihsel planlama kalintisi olarak duruyor.
+- Sprint-1 100% tamamlandi.
+- Sprint-2 icin acilan 4 ana tasktan TASK-024, TASK-025, TASK-026 ve TASK-027 tamamlandi.
+- macOS global hotkey riski unit test seviyesinde azaltildi.
+- macOS izin deneyimi urun diliyle netlestirildi.
+- Packaging stratejisi belirlendi.
+- Settings persistence tamamlandi.
 
 ## Test Count
 
-118 unit test basarili.
+146 unit test basarili.
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests/unit
+PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
 
 ## Open Bugs
@@ -29,19 +31,18 @@ Yok.
 
 ## Open Tasks
 
-- TASK-001 - MVP Kabul Cercevesi
-- TASK-008 - Pencere Degisince Durdurma Davranisi
+Yok.
 
 ## Release Readiness
 
-90%
+96%
 
 Karar: Go
 
 Gerekce:
 
 - Acik release blocker bug yok.
-- 118 unit test basarili.
+- 146 unit test basarili.
 - Windows uzerinde uctan uca manuel smoke test Passed sonuc verdi.
 
 ## Platform Readiness
@@ -51,10 +52,12 @@ Gerekce:
 - Global F8 hotkey akisi manuel olarak dogrulandi.
 - `Start` / `Stop`, `1` CPS ve `10` CPS manuel olarak dogrulandi.
 - Hedef pencere listeleme ve secimi var.
-- macOS: 85%
+- Pencere degisince durdurma davranisi unit test seviyesinde var.
+- macOS: 93%
 - Real mouse backend var.
-- Global hotkey adapter yok.
-- Accessibility/Input Monitoring izin deneyimi manuel dogrulanmali.
+- Global hotkey adapter unit test seviyesinde var.
+- Accessibility/Input Monitoring izin mesajlari urun diliyle netlestirildi.
+- Manuel macOS izin smoke testleri bekliyor.
 
 ## Suggested User Tests
 
@@ -62,20 +65,20 @@ Gerekce:
 - USER-TEST-002 - Hotkey Validation
 - USER-TEST-003 - Platform Validation
 - USER-TEST-004 - macOS Permission Validation
+- USER-TEST-005 - Settings Persistence Validation
+- USER-TEST-006 - Window Guard Validation
+- USER-TEST-007 - Release Artifact Smoke
 
 ## Suggested New Tasks
 
-- TASK-008 - Pencere Degisince Durdurma Davranisi
-- TASK-024 - macOS Global Hotkey Adapter
-- TASK-025 - Packaging Strategy
-- TASK-026 - Settings Persistence
-- TASK-027 - macOS Permission UX Review
+Yok.
 
 ## Suggested Next Action
 
-RELEASE REVIEW
+USER-TEST-006 - Window Guard Validation
 
 ## Decision Rationale
 
-Windows MVP icin ana release blockerlar kapandi. Bu nedenle en mantikli sonraki
-aksiyon yeni bir bug degil, release gozden gecirmesidir.
+QA Review tamamlandi. Acik blocker bug yok; kalan riskler manuel smoke testlere
+bagli. Kullanici guvenligiyle en dogrudan iliskili siradaki test window guard
+dogrulamasidir.

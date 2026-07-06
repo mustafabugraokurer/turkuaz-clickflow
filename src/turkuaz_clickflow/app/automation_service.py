@@ -30,11 +30,12 @@ class AutomationService:
         self,
         counter: Optional[ClickCounter] = None,
         timer: Optional[TimerService] = None,
+        settings: Optional[AutomationSettings] = None,
     ) -> None:
         self._state = AutomationState.READY
         self._counter = counter or ClickCounter()
         self._timer = timer or TimerService()
-        self._settings = AutomationSettings.defaults()
+        self._settings = settings or AutomationSettings.defaults()
         self._stop_reason: Optional[StopReason] = None
         self._run_count = 0
 

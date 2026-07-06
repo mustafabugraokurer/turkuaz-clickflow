@@ -9,6 +9,7 @@ from turkuaz_clickflow.app.click_runner import ClickRunner
 from turkuaz_clickflow.app.feedback_service import FeedbackService
 from turkuaz_clickflow.app.global_hotkey_controller import GlobalHotkeyController
 from turkuaz_clickflow.app.hotkey_service import HotkeyService
+from turkuaz_clickflow.config.settings_repository import create_settings_repository
 from turkuaz_clickflow.platform.registry import create_platform_adapter
 from turkuaz_clickflow.ui.viewmodels.main_window_viewmodel import MainWindowViewModel
 
@@ -29,7 +30,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         triggered = Signal(object)
 
     platform_adapter = create_platform_adapter()
-    automation_service = AutomationService()
+    settings_repository = create_settings_repository()
+    automation_service = AutomationService(settings=settings_repository.load())
     feedback_service = FeedbackService()
     hotkey_service = HotkeyService(automation_service)
     view_model = MainWindowViewModel(
@@ -37,6 +39,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         feedback_service=feedback_service,
         hotkey_service=hotkey_service,
         window_query=platform_adapter.windows,
+        settings_repository=settings_repository,
     )
     window_holder = {}
     click_runner = ClickRunner(
@@ -50,6 +53,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         feedback_service=feedback_service,
         on_feedback=view_model.show_feedback,
         on_update=lambda: window_holder["window"].refresh(),
+        window_query=platform_adapter.windows,
     )
     hotkey_bridge = HotkeyResultBridge()
 

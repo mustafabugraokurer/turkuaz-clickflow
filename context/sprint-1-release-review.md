@@ -1,174 +1,145 @@
-# TASK-023 — Sprint-1 Release Review
+# TASK-023 - Sprint-1 Release Review
 
-## Karar Özeti
+## Durum
 
-Sprint-1 teknik temel açısından güçlü tamamlandı; ancak ürün release edilmeye
-hazır değildir.
+Tamamlandi.
 
-MVP kabulü için ana bloklayıcı Windows üzerinde gerçek uçtan uca manuel smoke
-testin tamamlanmamış olmasıdır. BUG-001 CPS UI reset problemi çözülmüştür.
-macOS tarafında gerçek mouse backend'i oluşturulmuştur, ancak macOS global
-hotkey, paketleme, izin deneyimi ve ürün ayarları Sprint-2 kapsamına kalmıştır.
+## Tarih
 
-## Tamamlanan Görevler
+2026-07-05
 
-- TASK-002 — Ana Yüzey Bilgi Mimarisi
-- TASK-003 — Hız Ayarı Kuralları
-- TASK-004 — Sol Tıklama Motoru, domain temeli kısmi tamamlandı
-- TASK-005 — Start / Stop Durum Makinesi
-- TASK-006 — Global Kısayol Başlat / Durdur Akışı
-- TASK-009 — Sayaç ve Çalışma Süresi
-- TASK-010 — Durum, Uyarı ve Durma Sebebi Mesajları
-- TASK-011 — MVP Manuel Doğrulama Senaryoları
-- TASK-012 — MVP Kapsam Kapanış Kontrolü
-- TASK-013 — PySide6 Ana Pencere MVP
-- TASK-014 — Platform Adapter Interface
-- TASK-015 — Mouse Click Adapter
-- TASK-016 — Click Runner
-- TASK-017 — UI ile AutomationService Bağlantısı
-- TASK-018 — OS Global Hotkey Adapter
-- TASK-019 — Windows Real Mouse Backend
-- TASK-020 — UI ClickRunner Çalışma Döngüsü Bağlantısı
-- TASK-022 — macOS Real Mouse Backend
+## Karar Ozeti
 
-## Kalan Görevler
+Sprint-1, Windows MVP release candidate olarak Go durumundadir.
 
-### Sprint-1 Bloklayıcı
+Windows tarafinda `Start` / `Stop`, `1` CPS, `10` CPS ve global `F8` ile
+durdurma akisi manuel smoke test ile Passed sonuc vermistir. BUG-001 ve BUG-002
+kapatilmistir. Unit test paketi 146 test ile basarilidir.
 
-- TASK-021 — Windows MVP Manuel Smoke Test
+macOS tarafi teknik preview seviyesindedir. Real mouse backend vardir; ancak
+global hotkey ve izin deneyimi gercek macOS ortaminda manuel dogrulanmalidir.
+Packaging/signing calismalari Sprint-2 kapsaminda ele alinmalidir.
 
-Bu görev Windows ortamı gerektirdiği için mevcut `darwin` ortamında
-tamamlanamamıştır. MVP kabul kararı bu testten önce verilmemelidir.
+## Tamamlanan Gorevler
 
-### Çözülen Release Bugları
+- BUG-001 - CPS UI Reset
+- BUG-002 - Windows F8 ile durdurma calismiyor
+- TASK-001 - MVP Kabul Cercevesini Netlestir
+- TASK-002 - Ana Yuzey Bilgi Mimarisi
+- TASK-003 - Hiz Ayari Kurallari
+- TASK-004 - Sol Tiklama Motoru, domain temeli kismi tamamlandi
+- TASK-005 - Start / Stop Durum Makinesi
+- TASK-006 - Global Kisayol Baslat / Durdur Akisi
+- TASK-007 - Pencere Listeleme ve Hedef Secimi
+- TASK-008 - Pencere Degisince Durdurma Davranisi
+- TASK-009 - Sayac ve Calisma Suresi
+- TASK-010 - Durum, Uyari ve Durma Sebebi Mesajlari
+- TASK-011 - MVP Manuel Dogrulama Senaryolari
+- TASK-012 - MVP Kapsam Kapanis Kontrolu
+- TASK-013 - PySide6 Ana Pencere MVP
+- TASK-014 - Platform Adapter Interface
+- TASK-015 - Mouse Click Adapter
+- TASK-016 - Click Runner
+- TASK-017 - UI ile AutomationService Baglantisi
+- TASK-018 - OS Global Hotkey Adapter
+- TASK-019 - Windows Real Mouse Backend
+- TASK-020 - UI ClickRunner Calisma Dongusu Baglantisi
+- TASK-021 - Windows MVP Manuel Smoke Test
+- TASK-022 - macOS Real Mouse Backend
+- TASK-024 - macOS Global Hotkey Adapter
+- TASK-025 - Packaging Strategy
+- TASK-026 - Settings Persistence
+- TASK-027 - macOS Permission UX Review
 
-- BUG-001 — CPS değeri UI'da 10'a geri dönüyordu. Seçili CPS artık UI refresh sırasında korunur.
+## Kalan Gorevler
 
-### Eski / Gözden Geçirilecek
+### Sprint-1 Kalintisi
 
-- TASK-001 — MVP Kabul Çerçevesini Netleştir
+Yok. TASK-001 kapatildi ve kabul kararinin dokuman izi guncellendi.
 
-TASK-012 güncel kapsam kapanış kontrolünü yaptığı için TASK-001 artık tarihsel
-bir planlama kalıntısıdır. Sprint-2 başlangıcında kapatılmalı veya arşivlenmelidir.
+### Sprint-1 Disi / Opsiyonel
 
-### Sprint-1 Dışı / Opsiyonel
+Yok. TASK-008 tamamlandi; gercek OS window guard smoke test bekliyor.
 
-- TASK-007 — Pencere Listeleme ve Hedef Seçimi
-- TASK-008 — Pencere Değişince Durdurma Davranışı
+## QA Review
 
-Ürün sahibi kararına göre pencere seçimi ve pencere koruması opsiyoneldir;
-MVP çıkışını bloklamamalıdır.
+- Unit test durumu: 146 test basarili.
+- Manuel Windows MVP smoke test: Passed.
+- Bekleyen user-testler: CPS validation, hotkey validation, platform validation,
+  macOS permission validation.
+- Eksik manuel dogrulama: macOS real mouse backend, macOS F8 ve macOS izin
+  smoke testleri.
 
-## Teknik Borçlar
+## Product Review
 
-- Windows gerçek davranışları CI/unit test ile doğrulanamıyor; manuel smoke test şart.
-- macOS gerçek davranışı Accessibility/Input Monitoring izinlerine bağlı; izin deneyimi UI'da daha açık hale getirilmeli.
-- macOS global hotkey gerçek adapter'ı henüz yok.
-- Click loop QTimer ile çalışıyor; uzun vadede worker/thread sınırı ve UI thread güvenliği tekrar gözden geçirilmeli.
-- Platform adapter hata sınıflandırması temel seviyede; hata kodu/türü ayrımı ileride netleşmeli.
-- Ayarlar kalıcı değil; CPS, hotkey ve pencere seçenekleri uygulama kapanınca kaybolur.
-- Profil sistemi yok.
-- Paketleme, installer, imzalama ve dağıtım süreci yok.
-- Manuel test sonuçları platform bazında standardize edilmeye başladı ama release checklist henüz otomatik değil.
+Windows MVP kullanici icin temel vaadi karsilar:
 
-## Sprint-2 Önerileri
+- Tıklama baslatma/durdurma calisir.
+- F8 ile hizli durdurma calisir.
+- CPS ayari 1 ve 10 CPS senaryolarinda dogrulanmistir.
+- Pencere secimi vardir.
+- Sayac ve sure bilgisi gorunur.
 
-### P0 — Release Bloklayıcıları
+Urunlesme icin kalan ana bosluklar:
 
-1. TASK-021 — Windows MVP Manuel Smoke Test
-2. Windows smoke test sonucuna göre kritik hata düzeltmeleri
-3. macOS gerçek mouse backend smoke test
-4. macOS izin eksikliği mesajlarının UI'da doğrulanması
+- Packaging stratejisi var; artifact uretimi ve smoke test bekliyor.
+- Ayarlar kalici hale getirildi; yeniden acilis manuel smoke testi bekliyor.
+- macOS izin ve global hotkey manuel dogrulamasi tamam degil.
+- Pencere degisince durdurma davranisi baglandi; manuel smoke test bekliyor.
 
-### P1 — Platform Tamamlama
+## Release Review
 
-1. macOS OS Global Hotkey Adapter
-2. macOS F8 manuel smoke test
-3. Windows ve macOS adapter hata mesajlarının ortak kullanıcı diliyle hizalanması
+### Windows
 
-### P2 — Ürünleşme
+Karar: Go
 
-1. Packaging / installer stratejisi
-2. Windows installer
-3. macOS app bundle, imzalama ve notarization araştırması
-4. README kurulum ve izin yönergeleri
+Gerekce:
 
-### P3 — Kullanıcı Ayarları
+- Acik blocker bug yok.
+- Windows smoke test Passed.
+- Global F8 durdurma dogrulandi.
+- Unit test paketi basarili.
 
-1. CPS ve hotkey ayarlarını kaydetme
-2. Son kullanılan pencere koruması ayarını kaydetme
-3. Basit ayar dosyası veya platform uyumlu config konumu
+### macOS
 
-### P4 — Güvenlik ve Kontrol
+Karar: Teknik preview
 
-1. Pencere listeleme ve hedef seçimi
-2. Pencere değişince durdurma
-3. Hedef pencere kapanırsa durdurma
-4. Bu davranışlar için manuel kabul senaryolarını güncelleme
+Gerekce:
 
-### P5 — Büyüme Hazırlığı
+- Real mouse backend var.
+- Global hotkey adapter unit test seviyesinde var.
+- Accessibility/Input Monitoring izin mesajlari ayrildi; manuel dogrulama bekliyor.
+- macOS artifact uretimi, signing ve notarization hazir degil.
 
-1. Profil sistemi
-2. Birden fazla tıklama profili
-3. Sağ tık / çift tık seçenekleri
-4. Makro kayıt ve otomasyon senaryoları için ürün keşfi
+## Riskler
 
-## Önceliklendirme
+- RISK-002 - macOS Global Hotkey Manuel Dogrulama Bekliyor: Low.
+- RISK-003 - macOS Izin Deneyimi Manuel Dogrulama Bekliyor: Low.
+- RISK-004 - Packaging Artifact / Installer Yok: Low.
+- RISK-005 - Ayarlar Kalici Degil: Kapandi.
 
-1. Windows MVP manuel smoke test yapılmadan release kararı verilmemeli.
-2. macOS backend geliştirmesi tamamlandı; ancak macOS release iddiası için global hotkey ve izin deneyimi tamamlanmalı.
-3. Packaging/installer, MVP kabulünden sonra Sprint-2'nin en yüksek ürünleşme önceliği olmalı.
-4. Ayar kaydetme, gerçek kullanıcı deneyimi için packaging sonrası hemen ele alınmalı.
-5. Profil sistemi ve pencere koruması değerli ama MVP release bloklayıcısı değil.
+## Sprint-2 Onerileri
 
-## Test Durumu
+### P1
 
-Son unit test sonucu:
+1. QA Review.
+2. Window guard smoke test.
+3. Settings persistence smoke test.
+
+### P2
+
+1. Release artifact smoke test.
+
+## Test Sonucu
 
 ```bash
 PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
 
-Sonuç: 106 test başarılı.
+Son kayitli sonuc: 146 test basarili.
 
 ## Release Tavsiyesi
 
-Sprint-1, teknik temel sprinti olarak başarılıdır. Ürün release edilmemelidir.
+Windows MVP icin Go. Cross-platform public release icin No-Go.
 
-Release için minimum sonraki adım:
-
-- Windows üzerinde TASK-021 manuel smoke test çalıştırılsın.
-- Bloklayıcı hata çıkmazsa MVP kabul kararı yeniden değerlendirilsin.
-- Bloklayıcı hata çıkarsa Sprint-2 P0 hata düzeltme görevleri açılsın.
-
-## PM Brain V2 Notu
-
-Sprint-1 release review sonrasi PM Brain V2 aktif hale getirildi.
-
-- Product Owner Agent: ürün eksikleri ve release recommendation üretir.
-- QA Agent: test kapsami, smoke test ve bug raporlari üretir.
-- Release Agent: Go/No-Go, platform riskleri ve release blockers takip eder.
-
-Aktif takip dosyalari:
-
-- `.brain/health_report.md`
-- `.brain/open_risks.md`
-- `.brain/manual_validation.md`
-- `.brain/release_status.md`
-- `tasks/user-tests/`
-- `reviews/product-review-2026-06-11.md`
-
-## PM Brain V2.1 Karar Motoru
-
-`devam et` komutu artik sadece siradaki task'i secmez. Once health report,
-open risks, release status, manual validation ve user-test durumlari okunur.
-
-Mevcut karar motoru sonucu:
-
-- Open bug: Yok
-- High risk: Windows smoke test eksik
-- Release readiness: 78%
-- Windows readiness: 70%
-- macOS readiness: 85%
-- Release status: No-Go
-- Suggested next action: TASK-021 — Windows MVP Manuel Smoke Test
+Siradaki en mantikli aksiyon QA Review'dur.

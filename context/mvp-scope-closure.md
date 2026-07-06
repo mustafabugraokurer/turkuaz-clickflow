@@ -1,100 +1,68 @@
-# MVP Kapsam Kapanış Kontrolü
+# MVP Kapsam Kapanis Kontrolu
 
 ## Karar
 
-MVP kabul edilmedi. Revizyon gerekli.
+Windows MVP kabul edildi.
 
-Sprint-1 temel mimari, domain/app kuralları, PySide6 ana pencere iskeleti,
-platform adapter sınırları, ClickRunner ve Windows global hotkey adapter
-katmanı oluşturuldu. Ancak ürünün "ilk kullanılabilir auto clicker" olarak
-kabul edilebilmesi için gerçek tıklama üretimi ve UI üzerinden kesintisiz
-çalıştırma akışı henüz tamamlanmış değildir.
+Sprint-1 sonunda temel mimari, domain/app kurallari, PySide6 ana pencere,
+platform adapter sinirlari, ClickRunner, Windows real mouse backend, Windows
+global hotkey adapter ve UI calisma dongusu tamamlandi. Windows uzerinde
+yapilan manuel smoke test Passed sonuc verdi.
 
-## Doğrulanan Alanlar
+Genel cross-platform public release henuz hazir degildir. macOS tarafi teknik
+preview seviyesindedir.
 
-- CPS kuralı: minimum `1`, maksimum `100`, varsayılan `10`.
-- Varsayılan kısayol: `F8`.
+## Kabul Edilen Windows MVP Davranislari
+
+- Uygulama Windows uzerinde acilir.
+- CPS kuralı: minimum `1`, maksimum `100`, varsayilan `10`.
+- Start / Stop butonlari otomasyonu kontrol eder.
+- Varsayilan global kisayol `F8` ile durdurma calisir.
+- Start sonrasi gercek Windows sol tik uretimi yapilir.
+- Stop veya `F8` sonrasi tiklama kesilir.
+- `1` CPS ve `10` CPS manuel olarak dogrulanmistir.
+- Sayac gerceklesen tiklamalarla artar.
+- Calisma suresi gorunur.
+- Hedef pencere listeleme ve secimi vardir.
+- Gecersiz CPS kullaniciya anlasilir mesaj olarak yansitilir.
+
+## Dogrulanan Alanlar
+
+- CPS araligi ve varsayilan deger.
+- Varsayilan kısayol: `F8`.
 - Start / Stop durum makinesi.
-- Çalışırken tekrar Start verilince ikinci run başlatmama.
-- Stop komutunun güvenli kabul edilmesi.
-- Yeni run başlangıcında sayaç sıfırlama.
-- Başarılı tıklama olayında sayaç artırma.
-- Çalışma süresi hesaplama.
-- Durum, uyarı ve durma sebebi mesajları.
-- PySide6 ana pencere alanları ve viewmodel bağlantısı.
-- Platform adapter arayüzleri.
-- ClickRunner'ın bounded/test edilebilir tıklama adımları.
-- Windows global hotkey adapter'ın backend üzerinden F8 callback routing'i.
-- macOS Quartz mouse backend'i.
+- Calisirken tekrar Start verilince ikinci run baslatmama.
+- Stop komutunun guvenli kabul edilmesi.
+- Yeni run baslangicinda sayac sifirlama.
+- Basarili tiklama olayinda sayac artirma.
+- Calisma suresi hesaplama.
+- Durum, uyari ve durma sebebi mesajlari.
+- PySide6 ana pencere ve viewmodel baglantisi.
+- UI Start / Stop ve F8 akisi ile ClickRunner calisma dongusu.
+- Windows `SendInput` tabanli real mouse backend.
+- Windows global hotkey adapter.
+- Pencere listeleme ve hedef secimi.
+- macOS Quartz mouse backend.
 
-## Bloklayıcı Eksikler
+## MVP Icin Bloklayici Olmayanlar
 
-### B1 — Gerçek Windows Mouse Backend
+- Pencere degisince durdurma davranisi Sprint-2 guvenlik/kontrol iyilestirmesidir.
+- macOS global hotkey adapter unit test seviyesinde vardir; cross-platform
+  release icin gercek macOS ortaminda dogrulanmalidir.
+- macOS Accessibility/Input Monitoring izin mesajlari netlestirildi; gercek
+  macOS ortaminda manuel dogrulanmalidir.
+- Packaging stratejisi vardir; artifact uretimi ve smoke test Windows MVP
+  dagitimi icin gereklidir.
+- Settings persistence TASK-026 ile tamamlandi; manuel yeniden acilis smoke testi
+  bekliyor.
 
-Durum: Tamamlandı.
+## Kapsam Disi / Backlog Korunacak Maddeler
 
-Windows mouse adapter için gerçek `SendInput` tabanlı backend eklenmiştir.
-Windows dışı ortamda güvenli unavailable backend davranışı korunmuştur.
-
-Kalan doğrulama:
-
-- Gerçek OS davranışı Windows manuel smoke test ile doğrulanmalıdır.
-
-### B2 — UI Start Akışı ClickRunner'ı Çalıştırıyor
-
-Durum: Tamamlandı.
-
-PySide6 Start / Stop ve OS F8 hotkey akışı `ClickLoopController` üzerinden
-`ClickRunner` çalışma döngüsüne bağlanmıştır. QTimer scheduler UI event loop'u
-kilitlemeden tick üretir.
-
-Kalan doğrulama:
-
-- Gerçek Windows ortamında uçtan uca manuel smoke test yapılmalıdır.
-
-### B3 — Runner Arka Plan Çalışma Modeli
-
-Durum: Tamamlandı.
-
-ClickRunner bounded/test edilebilir yapısını korur; UI çalışma döngüsü
-`ClickLoopController` ve QTimer scheduler ile sağlanır.
-
-Kalan doğrulama:
-
-- CPS interval davranışı Windows manuel smoke testte gözlemlenmelidir.
-
-### B4 — Windows Üzerinde Manuel OS Doğrulama Yapılmadı
-
-Unit testler geçmektedir, ancak gerçek Windows ortamında şu davranışlar henüz
-manuel doğrulanmış değildir:
-
-- PySide6 uygulama açılışı.
-- F8'in uygulama odakta değilken yakalanması.
-- Start sonrası gerçek sol tık üretimi.
-- Stop/F8 sonrası tıklamanın kesilmesi.
-- Kısayol kayıt hatasının kullanıcı mesajına düşmesi.
-
-## MVP İçin Bloklayıcı Olmayanlar
-
-- Pencere seçimi isteğe bağlıdır.
-- Pencere koruması opsiyoneldir.
-- macOS için gerçek mouse/global hotkey implementasyonu Sprint-1 bloklayıcısı değildir; mimari hazırlık yeterlidir.
-- OCR, görüntü tanıma, makro kaydı, profil sistemi ve klavye otomasyonu kapsam dışıdır.
-
-## Kapsam Dışı / Backlog Korunacak Maddeler
-
-- TASK-007 — Pencere Listeleme ve Hedef Seçimi
-- TASK-008 — Pencere Değişince Durdurma Davranışı
-- Sağ tık / çift tık
-- Makro kayıt
+- Sag tik / cift tik
+- Makro kaydi
 - Klavye otomasyonu
-- OCR / görüntü tanıma
+- OCR / goruntu tanima
 - Profil sistemi
-- Dağıtım ve paketleme otomasyonu
-
-## Önerilen Revizyon Görevleri
-
-- TASK-021 — Windows MVP Manuel Smoke Test
 
 ## Son Test Sonucu
 
@@ -102,10 +70,20 @@ manuel doğrulanmış değildir:
 PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
 
-Sonuç: 99 test başarılı.
+Sonuc: 146 test basarili.
 
-## Ürün Sahibi Kararı İçin Öneri
+## Manuel Dogrulama Sonucu
 
-MVP kabul kararı verilmemeli. Önce TASK-021 tamamlanmalı. Bu görev
-tamamlandıktan sonra MVP gerçek kullanım senaryosu üzerinden tekrar kapanış
-kontrolüne alınmalıdır.
+Windows MVP manuel smoke test Passed:
+
+- `1` CPS tiklama calisti.
+- `10` CPS tiklama calisti.
+- `Start` / `Stop` akisi calisti.
+- `F8 ile durduruldu` davranisi retest sonrasi calisti.
+
+## Urun Sahibi Karari
+
+Windows MVP release candidate icin Go.
+
+Cross-platform public release icin No-Go; macOS global hotkey, macOS izin
+deneyimi ve packaging/signing/notarization isleri tamamlanmalidir.

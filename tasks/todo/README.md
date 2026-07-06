@@ -4,12 +4,16 @@ Bu klasor henuz tamamlanmamis gorevleri tutar.
 
 ## Siradaki Onerilen Gorev
 
-RELEASE REVIEW
+USER-TEST-006 - Window Guard Validation
 
 ## Sprint-1 Todo
 
-- TASK-001 - MVP Kabul Cercevesini Netlestir
+Yok.
+
+## Sprint-2 Todo
+
+Yok.
 
 ## Sprint-1 Disi / Opsiyonel
 
-- TASK-008 - Pencere Degisince Durdurma Davranisi
+Yok.

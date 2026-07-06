@@ -4,7 +4,7 @@
 
 Bu belge TASK-011 kapsaminda manuel kabul senaryolarini tanimlar.
 
-TASK-012 kapanis kontrolu sonrasi durum:
+TASK-001 kapanisi ve Windows smoke test sonrasi durum:
 
 - PySide6 ana pencere ve UI/app baglantisi olusturulmustur.
 - Windows global hotkey adapter katmani olusturulmustur.
@@ -12,7 +12,8 @@ TASK-012 kapanis kontrolu sonrasi durum:
 - UI Start / Stop ve F8 akisi ClickRunner calisma dongusune baglanmistir.
 - Windows mouse backend'i TASK-019 ile gercek `SendInput` backend'ine alinmistir; Windows disi ortamda guvenli unavailable backend davranisi vardir.
 - macOS mouse backend'i TASK-022 ile gercek Quartz backend'ine alinmistir; Accessibility veya Input Monitoring izni gerekebilir.
-- Gercek OS davranisi Windows smoke testte dogrulanmalidir.
+- Gercek Windows OS davranisi TASK-021 smoke testinde Passed sonuc vermistir.
+- macOS izin ve global hotkey davranisi ayrica dogrulanmalidir.
 
 Bu nedenle senaryolar ikiye ayrilmistir:
 

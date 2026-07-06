@@ -4,9 +4,10 @@ from turkuaz_clickflow.app.automation_service import AutomationService
 from turkuaz_clickflow.app.click_loop_controller import ClickLoopController
 from turkuaz_clickflow.app.click_runner import ClickRunner
 from turkuaz_clickflow.app.feedback_service import FeedbackService
+from turkuaz_clickflow.domain.automation_settings import AutomationSettings
 from turkuaz_clickflow.domain.automation_state import AutomationState
 from turkuaz_clickflow.domain.stop_reason import StopReason
-from turkuaz_clickflow.platform.interfaces import PlatformOperationError
+from turkuaz_clickflow.platform.interfaces import PlatformOperationError, WindowInfo
 
 
 class FakeScheduler:
@@ -44,6 +45,24 @@ class FailingMouse:
 
     def left_click(self) -> None:
         raise PlatformOperationError(self._message)
+
+
+class FakeWindowQuery:
+    def __init__(self, windows=None, active=None) -> None:
+        self._windows = list(windows or [])
+        self._active = active
+
+    def list_windows(self):
+        return list(self._windows)
+
+    def active_window(self):
+        return self._active
+
+    def set_windows(self, windows) -> None:
+        self._windows = list(windows)
+
+    def set_active(self, active) -> None:
+        self._active = active
 
 
 class BrokenRunner:
@@ -96,6 +115,123 @@ class ClickLoopControllerTest(unittest.TestCase):
         self.assertEqual(updates, ["updated"])
         self.assertEqual(automation.state, AutomationState.RUNNING)
 
+    def test_window_guard_allows_click_when_target_is_active(self) -> None:
+        target = WindowInfo(id="1", title="Target")
+        automation = AutomationService()
+        automation.start(
+            settings=AutomationSettings(
+                cps=10,
+                target_window_id="1",
+                target_window="Target",
+                window_guard_enabled=True,
+            )
+        )
+        mouse = FakeMouse()
+        controller = ClickLoopController(
+            automation_service=automation,
+            click_runner=ClickRunner(automation, mouse),
+            scheduler=FakeScheduler(),
+            feedback_service=FeedbackService(),
+            window_query=FakeWindowQuery(windows=[target], active=target),
+        )
+
+        result = controller.tick()
+
+        self.assertFalse(result.stopped)
+        self.assertEqual(mouse.clicks, 1)
+        self.assertEqual(automation.state, AutomationState.RUNNING)
+
+    def test_window_guard_stops_before_click_when_active_window_changes(self) -> None:
+        target = WindowInfo(id="1", title="Target")
+        other = WindowInfo(id="2", title="Other")
+        automation = AutomationService()
+        automation.start(
+            settings=AutomationSettings(
+                cps=10,
+                target_window_id="1",
+                target_window="Target",
+                window_guard_enabled=True,
+            )
+        )
+        mouse = FakeMouse()
+        feedback_messages = []
+        scheduler = FakeScheduler()
+        controller = ClickLoopController(
+            automation_service=automation,
+            click_runner=ClickRunner(automation, mouse),
+            scheduler=scheduler,
+            feedback_service=FeedbackService(),
+            on_feedback=lambda message: feedback_messages.append(message.text),
+            window_query=FakeWindowQuery(windows=[target, other], active=other),
+        )
+        controller.sync_with_automation()
+
+        result = controller.tick()
+
+        self.assertTrue(result.stopped)
+        self.assertEqual(result.stop_reason, StopReason.WINDOW_CHANGED)
+        self.assertEqual(mouse.clicks, 0)
+        self.assertTrue(scheduler.stopped)
+        self.assertEqual(
+            feedback_messages,
+            ["Durdu. Son durma sebebi: Pencere değişti."],
+        )
+
+    def test_window_guard_stops_when_target_window_is_missing(self) -> None:
+        other = WindowInfo(id="2", title="Other")
+        automation = AutomationService()
+        automation.start(
+            settings=AutomationSettings(
+                cps=10,
+                target_window_id="1",
+                target_window="Target",
+                window_guard_enabled=True,
+            )
+        )
+        mouse = FakeMouse()
+        feedback_messages = []
+        controller = ClickLoopController(
+            automation_service=automation,
+            click_runner=ClickRunner(automation, mouse),
+            scheduler=FakeScheduler(),
+            feedback_service=FeedbackService(),
+            on_feedback=lambda message: feedback_messages.append(message.text),
+            window_query=FakeWindowQuery(windows=[other], active=other),
+        )
+
+        result = controller.tick()
+
+        self.assertTrue(result.stopped)
+        self.assertEqual(result.stop_reason, StopReason.TARGET_WINDOW_MISSING)
+        self.assertEqual(mouse.clicks, 0)
+        self.assertEqual(
+            feedback_messages,
+            ["Durdu. Son durma sebebi: Hedef pencere bulunamadı."],
+        )
+
+    def test_window_guard_stops_when_enabled_without_target_window(self) -> None:
+        automation = AutomationService()
+        automation.start(
+            settings=AutomationSettings(
+                cps=10,
+                window_guard_enabled=True,
+            )
+        )
+        mouse = FakeMouse()
+        controller = ClickLoopController(
+            automation_service=automation,
+            click_runner=ClickRunner(automation, mouse),
+            scheduler=FakeScheduler(),
+            feedback_service=FeedbackService(),
+            window_query=FakeWindowQuery(),
+        )
+
+        result = controller.tick()
+
+        self.assertTrue(result.stopped)
+        self.assertEqual(result.stop_reason, StopReason.TARGET_WINDOW_MISSING)
+        self.assertEqual(mouse.clicks, 0)
+
     def test_sync_stops_scheduler_when_automation_stops(self) -> None:
         automation = AutomationService()
         automation.start(cps=10)
@@ -142,7 +278,7 @@ class ClickLoopControllerTest(unittest.TestCase):
         self.assertEqual(automation.state, AutomationState.STOPPED)
         self.assertEqual(
             feedback_messages,
-            ["Tıklama başlatılamadı: click failed"],
+            ["İşlem başlatılamadı: click failed"],
         )
         self.assertIn("Click runner stopped with error: click failed", logs.output[0])
 
@@ -169,7 +305,11 @@ class ClickLoopControllerTest(unittest.TestCase):
 
         self.assertEqual(
             feedback_messages,
-            ["macOS erişilebilirlik izni gerekli olabilir."],
+            [
+                "macOS Accessibility izni gerekli olabilir. Sistem "
+                "Ayarları > Gizlilik ve Güvenlik > Accessibility "
+                "bölümünden uygulamaya izin verin."
+            ],
         )
         self.assertEqual(automation.counter.value, 0)
 
@@ -196,7 +336,7 @@ class ClickLoopControllerTest(unittest.TestCase):
 
         self.assertEqual(
             feedback_messages,
-            ["Bu platformda tıklama backend'i kullanılamıyor."],
+            ["Bu platformda otomasyon backend'i kullanılamıyor."],
         )
         self.assertEqual(automation.counter.value, 0)
 
@@ -224,7 +364,7 @@ class ClickLoopControllerTest(unittest.TestCase):
         self.assertEqual(automation.counter.value, 0)
         self.assertEqual(
             feedback_messages,
-            ["Tıklama başlatılamadı: runner exploded"],
+            ["İşlem başlatılamadı: runner exploded"],
         )
         self.assertIn("Unhandled click runner exception: runner exploded", logs.output[0])
 

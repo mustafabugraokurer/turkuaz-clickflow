@@ -12,6 +12,9 @@ gerekirse bug veya task olusturulur.
 - USER-TEST-002 - Hotkey Validation
 - USER-TEST-003 - Platform Validation
 - USER-TEST-004 - macOS Permission Validation
+- USER-TEST-005 - Settings Persistence Validation
+- USER-TEST-006 - Window Guard Validation
+- USER-TEST-007 - Release Artifact Smoke
 
 ## Tamamlanan User Tests
 

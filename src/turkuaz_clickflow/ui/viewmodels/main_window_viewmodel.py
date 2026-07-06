@@ -6,6 +6,7 @@ from typing import Optional
 from turkuaz_clickflow.app.automation_service import AutomationService
 from turkuaz_clickflow.app.feedback_service import FeedbackMessage, FeedbackService
 from turkuaz_clickflow.app.hotkey_service import HotkeyResult, HotkeyService
+from turkuaz_clickflow.config.settings_repository import SettingsRepository
 from turkuaz_clickflow.domain.automation_settings import AutomationSettings
 from turkuaz_clickflow.domain.automation_state import AutomationState
 from turkuaz_clickflow.domain.cps_policy import CpsPolicy
@@ -41,11 +42,13 @@ class MainWindowViewModel:
         feedback_service: FeedbackService,
         hotkey_service: Optional[HotkeyService] = None,
         window_query: Optional[WindowQueryAdapter] = None,
+        settings_repository: Optional[SettingsRepository] = None,
     ) -> None:
         self._automation_service = automation_service
         self._feedback_service = feedback_service
         self._hotkey_service = hotkey_service or HotkeyService(automation_service)
         self._window_query = window_query
+        self._settings_repository = settings_repository
         self._last_feedback: Optional[FeedbackMessage] = None
         self._selected_cps = automation_service.settings.cps
         self._selected_target_window_id = automation_service.settings.target_window_id
@@ -63,6 +66,7 @@ class MainWindowViewModel:
         """Store the user's CPS selection without starting automation."""
         CpsPolicy().validate(cps)
         self._selected_cps = cps
+        self._save_selected_settings()
         return self.snapshot()
 
     def select_target_window(self, window_id: Optional[str]) -> MainWindowSnapshot:
@@ -71,6 +75,7 @@ class MainWindowViewModel:
         if not window_id:
             self._selected_target_window_id = None
             self._selected_target_window_title = None
+            self._save_selected_settings()
             return self.snapshot()
 
         selected = next(
@@ -84,15 +89,18 @@ class MainWindowViewModel:
         if selected is None:
             self._selected_target_window_id = None
             self._selected_target_window_title = None
+            self._save_selected_settings()
             return self.snapshot()
 
         self._selected_target_window_id = selected.id
         self._selected_target_window_title = selected.title
+        self._save_selected_settings()
         return self.snapshot()
 
     def set_window_guard_enabled(self, enabled: bool) -> MainWindowSnapshot:
         """Store the window-guard toggle for the next run."""
         self._window_guard_enabled = enabled
+        self._save_selected_settings()
         return self.snapshot()
 
     def start(self, cps: int) -> MainWindowSnapshot:
@@ -116,6 +124,7 @@ class MainWindowViewModel:
             self._window_guard_enabled = (
                 self._automation_service.settings.window_guard_enabled
             )
+            self._save_selected_settings()
         self._last_feedback = self._feedback_service.for_automation_result(result)
         return self.snapshot()
 
@@ -208,6 +217,19 @@ class MainWindowViewModel:
             target_window_id=self._selected_target_window_id,
             target_window=self._selected_target_window_title,
             window_guard_enabled=self._window_guard_enabled,
+        )
+
+    def _save_selected_settings(self) -> None:
+        if self._settings_repository is None:
+            return
+        self._settings_repository.save(
+            AutomationSettings(
+                cps=self._selected_cps,
+                hotkey=self._automation_service.settings.hotkey,
+                target_window_id=self._selected_target_window_id,
+                target_window=self._selected_target_window_title,
+                window_guard_enabled=self._window_guard_enabled,
+            )
         )
 
     def _resolve_feedback(self) -> FeedbackMessage:

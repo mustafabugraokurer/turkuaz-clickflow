@@ -38,7 +38,7 @@ class PlatformInterfacesTest(unittest.TestCase):
 
         self.assertEqual(adapter.name, "macos")
         self.assertTrue(adapter.capabilities.mouse_click)
-        self.assertFalse(adapter.capabilities.global_hotkey)
+        self.assertTrue(adapter.capabilities.global_hotkey)
         self.assertFalse(adapter.capabilities.window_query)
 
     def test_unsupported_platform_raises(self) -> None:

@@ -4,6 +4,14 @@
 
 Done
 
+## Guncel Not
+
+Bu dosya TASK-012 tamamlandigi andaki revizyon kararini kaydeder. Windows real
+mouse backend, UI ClickRunner dongusu ve Windows MVP smoke test daha sonra
+tamamlanmistir. Guncel kabul karari icin `tasks/done/TASK-001-mvp-kabul-cercevesi.md`,
+`context/mvp-scope-closure.md` ve `context/sprint-1-release-review.md`
+dosyalari esas alinmalidir.
+
 ## Tamamlanma Özeti
 
 MVP kapsam kapanış kontrolü yapıldı. Sonuç: MVP kabul edilmedi, revizyon

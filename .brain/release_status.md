@@ -6,7 +6,7 @@ Go
 
 ## Release Readiness Score
 
-90%
+96%
 
 ## Neden
 
@@ -33,27 +33,32 @@ Hazir olanlar:
 - F8 global hotkey adapter
 - CPS UI reset bug fix
 - Hedef pencere listeleme ve secimi
+- Pencere degisince durdurma davranisi
+- Settings persistence
 - `Start` / `Stop`, `1` CPS, `10` CPS ve `F8` manuel olarak dogrulandi
 
 Eksik:
 
-- Packaging / installer
+- Packaging artifact uretimi ve smoke test
 
 ### macOS
 
 Durum: Teknik preview seviyesinde.
 
-Readiness: 85%
+Readiness: 93%
 
 Hazir olanlar:
 
 - Real mouse backend
 - UI ClickRunner dongusu
 - Izin hatasi icin daha net mesaj
+- Global hotkey adapter
+- Accessibility/Input Monitoring izin mesajlari ayrildi
+- Settings persistence
 
 Eksik:
 
-- macOS global hotkey adapter
+- macOS global hotkey manuel smoke test
 - macOS izin deneyimi dogrulamasi
 - macOS release packaging / signing / notarization
 
@@ -63,15 +68,29 @@ Yok.
 
 ## Decision Engine Next Action
 
-RELEASE REVIEW
+USER-TEST-006 - Window Guard Validation
 
 Gerekce:
 
 - High severity Windows blocker kapandi.
 - Kullanici smoke testi Passed sonuc verdi.
-- Siradaki mantikli aksiyon release gozden gecirmesidir.
+- 2026-07-05 release review guncellendi.
+- TASK-001 kapatildi.
+- TASK-024 tamamlandi.
+- TASK-027 tamamlandi.
+- TASK-025 tamamlandi.
+- TASK-026 tamamlandi.
+- TASK-008 tamamlandi.
+- QA Review tamamlandi.
+- Siradaki mantikli aksiyon window guard manuel smoke testidir.
 
 ## Recently Resolved
 
 - BUG-001 - CPS UI Reset
 - BUG-002 - Windows F8 ile durdurma calismiyor
+- TASK-001 - MVP Kabul Cercevesini Netlestir
+- TASK-024 - macOS Global Hotkey Adapter
+- TASK-025 - Packaging Strategy
+- TASK-026 - Settings Persistence
+- TASK-027 - macOS Permission UX Review
+- TASK-008 - Pencere Degisince Durdurma Davranisi

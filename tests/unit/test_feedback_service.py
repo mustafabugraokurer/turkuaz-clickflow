@@ -87,6 +87,45 @@ class FeedbackServiceTest(unittest.TestCase):
             "Kısayol kullanılamıyor. F8 başka bir uygulama tarafından kullanılıyor olabilir.",
         )
 
+    def test_hotkey_permission_error_tells_user_where_to_grant_access(self) -> None:
+        result = HotkeyResult(
+            accepted=False,
+            hotkey="F8",
+            action="register_failed",
+            message=(
+                "macOS global hotkey could not be registered. "
+                "Input Monitoring permission may be required."
+            ),
+        )
+
+        message = self.feedback.for_hotkey_result(result)
+
+        self.assertEqual(message.level, "warning")
+        self.assertIn("Input Monitoring", message.text)
+        self.assertIn("Sistem Ayarları", message.text)
+
+    def test_mouse_permission_error_tells_user_where_to_grant_access(self) -> None:
+        message = self.feedback.for_platform_error(
+            "macOS Accessibility or Input Monitoring permission is required",
+            operation="mouse",
+        )
+
+        self.assertEqual(message.level, "warning")
+        self.assertIn("Accessibility", message.text)
+        self.assertIn("Sistem Ayarları", message.text)
+
+    def test_platform_unavailable_error_is_user_facing(self) -> None:
+        message = self.feedback.for_platform_error(
+            "macOS mouse API is not available",
+            operation="mouse",
+        )
+
+        self.assertEqual(message.level, "error")
+        self.assertEqual(
+            message.text,
+            "Bu platformda otomasyon backend'i kullanılamıyor.",
+        )
+
     def test_current_message_prefers_stop_reason(self) -> None:
         message = self.feedback.current_message(
             AutomationState.STOPPED,
@@ -101,4 +140,3 @@ class FeedbackServiceTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

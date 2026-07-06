@@ -47,3 +47,13 @@ Run unit tests with:
 ```bash
 PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
+
+## Packaging
+
+Packaging strategy is documented in `context/packaging-strategy.md`.
+
+Install packaging tooling with:
+
+```bash
+python3 -m pip install -e ".[package]"
+```

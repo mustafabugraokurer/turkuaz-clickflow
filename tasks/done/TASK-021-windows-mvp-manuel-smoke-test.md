@@ -25,7 +25,7 @@ Tamamlandi.
 
 - Kullanici manuel smoke sonucu: Passed
 - Platform: Windows
-- Son unit test: `PYTHONPATH=src python -m unittest discover -s tests/unit`
+- Son unit test: `PYTHONPATH=src python3 -m unittest discover -s tests/unit`
 - Sonuc: 118 test basarili.
 
 # Kapsam Disi Birakilanlar

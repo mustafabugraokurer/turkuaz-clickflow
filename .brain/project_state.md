@@ -6,7 +6,7 @@ Turkuaz ClickFlow, tekrar eden masaustu tiklama islemlerini guvenli ve kontrollu
 
 ## Aktif Sprint
 
-Sprint-1: Windows odakli minimum auto clicker cekirdegi ve macOS uyumluluk hazirligi.
+Sprint-2: macOS readiness, izin deneyimi ve urunlesme hazirligi.
 
 ## Gecerli Kararlar
 
@@ -23,12 +23,14 @@ Sprint-1: Windows odakli minimum auto clicker cekirdegi ve macOS uyumluluk hazir
 
 - BUG-001 - CPS UI Reset
 - BUG-002 - Windows F8 ile durdurma calismiyor
+- TASK-001 - MVP Kabul Cercevesini Netlestir
 - TASK-002 - Ana Yuzey Bilgi Mimarisi
 - TASK-003 - Hiz Ayari Kurallari
 - TASK-004 - Sol Tiklama Motoru, domain temeli kismi tamamlandi
 - TASK-005 - Start / Stop Durum Makinesi
 - TASK-006 - Global Kisayol Baslat / Durdur Akisi
 - TASK-007 - Pencere Listeleme ve Hedef Secimi
+- TASK-008 - Pencere Degisince Durdurma Davranisi
 - TASK-009 - Sayac ve Calisma Suresi
 - TASK-010 - Durum, Uyari ve Durma Sebebi Mesajlari
 - TASK-011 - MVP Manuel Dogrulama Senaryolari
@@ -43,10 +45,18 @@ Sprint-1: Windows odakli minimum auto clicker cekirdegi ve macOS uyumluluk hazir
 - TASK-020 - UI ClickRunner Calisma Dongusu Baglantisi
 - TASK-021 - Windows MVP Manuel Smoke Test
 - TASK-022 - macOS Real Mouse Backend
+- TASK-024 - macOS Global Hotkey Adapter
+- TASK-025 - Packaging Strategy
+- TASK-026 - Settings Persistence
+- TASK-027 - macOS Permission UX Review
 
 ## Devam Eden / Kalan Sprint-1 Gorevleri
 
-- TASK-001 - MVP Kabul Cercevesi
+Yok.
+
+## Sprint-2 Gorevleri
+
+Yok.
 
 ## Acik Buglar
 
@@ -67,18 +77,18 @@ olmaya devam ediyor.
 
 ## Sprint-1 Disi / Opsiyonel
 
-- TASK-008 - Pencere Degisince Durdurma Davranisi
+Yok.
 
 ## Son Dogrulama
 
 Son unit test sonucu:
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests/unit
+PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
 
-Sonuc: 118 test basarili.
+Sonuc: 146 test basarili.
 
 ## Sonraki Onerilen Task
 
-RELEASE REVIEW
+USER-TEST-006 - Window Guard Validation

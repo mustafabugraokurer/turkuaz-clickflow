@@ -9,6 +9,7 @@ from turkuaz_clickflow.app.click_runner import ClickRunner, ClickRunnerResult
 from turkuaz_clickflow.app.feedback_service import FeedbackMessage, FeedbackService
 from turkuaz_clickflow.domain.automation_state import AutomationState
 from turkuaz_clickflow.domain.stop_reason import StopReason
+from turkuaz_clickflow.platform.interfaces import WindowQueryAdapter
 
 
 logger = logging.getLogger(__name__)
@@ -43,6 +44,7 @@ class ClickLoopController:
         feedback_service: FeedbackService,
         on_feedback: Optional[Callable[[FeedbackMessage], None]] = None,
         on_update: Optional[Callable[[], None]] = None,
+        window_query: Optional[WindowQueryAdapter] = None,
     ) -> None:
         self._automation_service = automation_service
         self._click_runner = click_runner
@@ -50,6 +52,7 @@ class ClickLoopController:
         self._feedback_service = feedback_service
         self._on_feedback = on_feedback
         self._on_update = on_update
+        self._window_query = window_query
         self._running = False
 
     @property
@@ -73,6 +76,11 @@ class ClickLoopController:
 
     def tick(self) -> ClickRunnerResult:
         """Run one click tick and update scheduler/feedback state."""
+        guard_result = self._stop_if_window_guard_violated()
+        if guard_result is not None:
+            self._handle_runner_result(guard_result)
+            return guard_result
+
         try:
             result = self._click_runner.run_once()
         except Exception as exc:
@@ -85,6 +93,10 @@ class ClickLoopController:
                 stop_reason=StopReason.ERROR,
                 error_message=str(exc),
             )
+        self._handle_runner_result(result)
+        return result
+
+    def _handle_runner_result(self, result: ClickRunnerResult) -> None:
         if result.error_message:
             logger.error("Click runner stopped with error: %s", result.error_message)
         if result.stopped:
@@ -94,7 +106,6 @@ class ClickLoopController:
             self._on_feedback(self._feedback_for_runner_result(result))
         if self._on_update is not None:
             self._on_update()
-        return result
 
     def stop(self) -> None:
         """Stop scheduled runner ticks."""
@@ -105,33 +116,44 @@ class ClickLoopController:
     def _interval_ms(self) -> int:
         return max(1, int(round(self._click_runner.click_interval_seconds * 1000)))
 
+    def _stop_if_window_guard_violated(self) -> Optional[ClickRunnerResult]:
+        settings = self._automation_service.settings
+        if not settings.window_guard_enabled:
+            return None
+        if self._window_query is None:
+            return None
+
+        if not settings.target_window_id:
+            return self._stop_for_window_guard(StopReason.TARGET_WINDOW_MISSING)
+
+        windows = self._window_query.list_windows()
+        target_exists = any(window.id == settings.target_window_id for window in windows)
+        if not target_exists:
+            return self._stop_for_window_guard(StopReason.TARGET_WINDOW_MISSING)
+
+        active_window = self._window_query.active_window()
+        if active_window is None:
+            return self._stop_for_window_guard(StopReason.TARGET_WINDOW_MISSING)
+        if active_window.id != settings.target_window_id:
+            return self._stop_for_window_guard(StopReason.WINDOW_CHANGED)
+        return None
+
+    def _stop_for_window_guard(self, reason: StopReason) -> ClickRunnerResult:
+        stop_result = self._automation_service.stop(reason=reason)
+        return ClickRunnerResult(
+            attempted_clicks=0,
+            successful_clicks=0,
+            stopped=True,
+            stop_reason=stop_result.stop_reason,
+        )
+
     def _feedback_for_runner_result(
         self,
         result: ClickRunnerResult,
     ) -> FeedbackMessage:
         if result.stop_reason is StopReason.ERROR and result.error_message:
-            return FeedbackMessage(
-                level="error",
-                text=self._human_error_message(result.error_message),
+            return self._feedback_service.for_platform_error(
+                result.error_message,
+                operation="mouse",
             )
         return self._feedback_service.for_stop_reason(result.stop_reason)
-
-    @staticmethod
-    def _human_error_message(error_message: str) -> str:
-        normalized = error_message.lower()
-        if (
-            "accessibility" in normalized
-            or "input monitoring" in normalized
-            or "permission" in normalized
-            or "izin" in normalized
-        ):
-            return "macOS erişilebilirlik izni gerekli olabilir."
-        if (
-            "not available" in normalized
-            or "not implemented" in normalized
-            or "unavailable" in normalized
-            or "api is not available" in normalized
-            or "backend" in normalized and "kullanılamıyor" in normalized
-        ):
-            return "Bu platformda tıklama backend'i kullanılamıyor."
-        return f"Tıklama başlatılamadı: {error_message}"

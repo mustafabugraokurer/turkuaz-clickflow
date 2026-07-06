@@ -28,7 +28,7 @@ Tamamlandi.
 
 # Test Sonucu
 
-- `PYTHONPATH=src python -m unittest discover -s tests/unit`
+- `PYTHONPATH=src python3 -m unittest discover -s tests/unit`
 - Sonuc: 118 test basarili.
 - Kullanici retest sonucu: Windows ortaminda `F8 ile durduruldu` adimi calisti.
 

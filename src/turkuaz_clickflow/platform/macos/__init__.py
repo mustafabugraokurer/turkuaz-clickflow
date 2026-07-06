@@ -4,8 +4,11 @@ from dataclasses import dataclass, field
 
 from turkuaz_clickflow.platform.interfaces import PlatformCapabilities
 from turkuaz_clickflow.platform.unsupported import (
-    UnsupportedGlobalHotkeyAdapter,
     UnsupportedWindowQueryAdapter,
+)
+from turkuaz_clickflow.platform.macos.hotkey import (
+    MacOSGlobalHotkeyAdapter,
+    create_macos_hotkey_backend,
 )
 from turkuaz_clickflow.platform.macos.mouse import (
     MacOSMouseClickAdapter,
@@ -20,11 +23,15 @@ class MacOSPlatformAdapter:
     name: str = "macos"
     capabilities: PlatformCapabilities = PlatformCapabilities(
         mouse_click=True,
-        global_hotkey=False,
+        global_hotkey=True,
         window_query=False,
     )
     mouse: MacOSMouseClickAdapter = field(
         default_factory=lambda: MacOSMouseClickAdapter(create_macos_mouse_backend())
     )
-    hotkeys: UnsupportedGlobalHotkeyAdapter = UnsupportedGlobalHotkeyAdapter()
+    hotkeys: MacOSGlobalHotkeyAdapter = field(
+        default_factory=lambda: MacOSGlobalHotkeyAdapter(
+            create_macos_hotkey_backend()
+        )
+    )
     windows: UnsupportedWindowQueryAdapter = UnsupportedWindowQueryAdapter()

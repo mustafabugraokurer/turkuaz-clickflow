@@ -19,6 +19,9 @@ dependencies = [
 dev = [
   "pytest>=8.0"
 ]
+package = [
+  "pyinstaller>=6.0"
+]
 
 [project.scripts]
 turkuaz-clickflow = "turkuaz_clickflow.main:main"

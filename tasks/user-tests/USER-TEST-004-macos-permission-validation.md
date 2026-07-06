@@ -15,16 +15,23 @@ macOS
 1. Uygulama veya terminal icin Accessibility iznini kapat.
 2. Uygulamayi baslat.
 3. Start'a bas.
-4. Mesaj alaninda izin ihtiyacinin net belirtildigini dogrula.
+4. Mesaj alaninda Accessibility izin ihtiyacinin net belirtildigini dogrula.
 5. Accessibility iznini ver.
 6. Uygulamayi tekrar baslat.
-7. Start / Stop akisini tekrar dene.
+7. Input Monitoring iznini kapat.
+8. F8 kısayolunu dene.
+9. Mesaj alaninda Input Monitoring izin ihtiyacinin net belirtildigini dogrula.
+10. Input Monitoring iznini ver.
+11. Uygulamayi tekrar baslat.
+12. Start / Stop ve F8 akisini tekrar dene.
 
 ## Beklenen Sonuc
 
 - Izin yoksa uygulama sessizce calisir gibi gorunmez.
-- Mesaj: `macOS erişilebilirlik izni gerekli olabilir.`
+- Mouse/tiklama izin mesaji: `macOS Accessibility izni gerekli olabilir. Sistem Ayarları > Gizlilik ve Güvenlik > Accessibility bölümünden uygulamaya izin verin.`
+- Hotkey izin mesaji: `macOS Input Monitoring izni gerekli olabilir. Sistem Ayarları > Gizlilik ve Güvenlik > Input Monitoring bölümünden uygulamaya izin verin.`
 - Izin verildikten sonra tiklama dongusu guvenli hedef alanda calisir.
+- Izin verildikten sonra F8 uygulama odakta degilken de calisir.
 
 ## Durum
 

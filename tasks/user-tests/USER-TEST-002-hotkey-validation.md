@@ -6,8 +6,7 @@ F8 kisa yolunun otomasyonu baslatma ve durdurma davranisini dogrulamak.
 
 ## Platform
 
-Windows icin release blocker. macOS icin global hotkey adapter tamamlandiktan
-sonra calistirilir.
+Windows smoke testte Passed. macOS icin TASK-024 sonrasi manuel retest bekliyor.
 
 ## Adimlar
 
@@ -21,7 +20,7 @@ sonra calistirilir.
 ## Beklenen Sonuc
 
 - F8 Start/Stop toggle davranisini tetikler.
-- Uygulama odakta degilken de Windows'ta calisir.
+- Uygulama odakta degilken de Windows ve macOS'ta calisir.
 - Stop reason `HOTKEY_STOPPED` olarak gorunur.
 
 ## Durum

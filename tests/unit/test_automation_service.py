@@ -2,6 +2,7 @@ import unittest
 
 from turkuaz_clickflow.app.automation_service import AutomationService
 from turkuaz_clickflow.app.timer_service import TimerService
+from turkuaz_clickflow.domain.automation_settings import AutomationSettings
 from turkuaz_clickflow.domain.automation_state import AutomationState
 from turkuaz_clickflow.domain.stop_reason import StopReason
 
@@ -23,6 +24,11 @@ class AutomationServiceTest(unittest.TestCase):
 
         self.assertEqual(service.state, AutomationState.READY)
         self.assertIsNone(service.stop_reason)
+
+    def test_initial_settings_can_be_loaded_from_persistence(self) -> None:
+        service = AutomationService(settings=AutomationSettings(cps=22, hotkey="F8"))
+
+        self.assertEqual(service.settings.cps, 22)
 
     def test_start_with_valid_settings_transitions_to_running(self) -> None:
         service = AutomationService()

@@ -30,8 +30,10 @@ manuel olarak doğrulamak.
 - Gerçek sol tık üretilir.
 - Sayaç yalnızca gerçekleşen tıklamalarla artar.
 - Stop sonrası yeni tıklama üretilmez.
-- İzin eksikliği varsa otomasyon sessizce çalışır gibi görünmez; hata güvenli şekilde yüzeye çıkar.
+- Accessibility izni eksikse otomasyon sessizce çalışır gibi görünmez.
+- Mesaj: `macOS Accessibility izni gerekli olabilir. Sistem Ayarları > Gizlilik ve Güvenlik > Accessibility bölümünden uygulamaya izin verin.`
 
 ## Not
 
-macOS global hotkey implementasyonu bu task kapsamında değildir.
+macOS global hotkey adapter TASK-024 ile unit test seviyesinde eklendi. Gercek
+macOS F8 davranisi USER-TEST-002 kapsaminda ayrica dogrulanmalidir.

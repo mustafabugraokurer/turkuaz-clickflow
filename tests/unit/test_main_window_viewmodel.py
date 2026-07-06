@@ -22,6 +22,17 @@ class StubWindowQueryAdapter:
         self._windows = list(windows)
 
 
+class FakeSettingsRepository:
+    def __init__(self) -> None:
+        self.saved = []
+
+    def load(self):
+        raise AssertionError("viewmodel should not load settings")
+
+    def save(self, settings) -> None:
+        self.saved.append(settings)
+
+
 class MainWindowViewModelTest(unittest.TestCase):
     def test_default_snapshot_matches_mvp_wireframe_values(self) -> None:
         view_model = MainWindowViewModel(
@@ -133,6 +144,23 @@ class MainWindowViewModelTest(unittest.TestCase):
         self.assertEqual(automation.settings.target_window, "Untitled - Notepad")
         self.assertTrue(automation.settings.window_guard_enabled)
 
+    def test_target_window_and_guard_selection_are_saved(self) -> None:
+        repository = FakeSettingsRepository()
+        adapter = StubWindowQueryAdapter([WindowInfo(id="1", title="Untitled - Notepad")])
+        view_model = MainWindowViewModel(
+            automation_service=AutomationService(),
+            feedback_service=FeedbackService(),
+            window_query=adapter,
+            settings_repository=repository,
+        )
+
+        view_model.select_target_window("1")
+        view_model.set_window_guard_enabled(True)
+
+        self.assertEqual(repository.saved[-1].target_window_id, "1")
+        self.assertEqual(repository.saved[-1].target_window, "Untitled - Notepad")
+        self.assertTrue(repository.saved[-1].window_guard_enabled)
+
     def test_cps_selection_is_preserved_before_start(self) -> None:
         view_model = MainWindowViewModel(
             automation_service=AutomationService(),
@@ -145,6 +173,18 @@ class MainWindowViewModelTest(unittest.TestCase):
         self.assertEqual(changed.cps, 25)
         self.assertEqual(refreshed.cps, 25)
         self.assertEqual(view_model.selected_cps, 25)
+
+    def test_cps_selection_is_saved_when_repository_is_configured(self) -> None:
+        repository = FakeSettingsRepository()
+        view_model = MainWindowViewModel(
+            automation_service=AutomationService(),
+            feedback_service=FeedbackService(),
+            settings_repository=repository,
+        )
+
+        view_model.set_cps(25)
+
+        self.assertEqual(repository.saved[-1].cps, 25)
 
     def test_start_uses_and_preserves_selected_cps(self) -> None:
         automation = AutomationService()

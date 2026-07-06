@@ -69,6 +69,8 @@ class FeedbackService:
     def for_hotkey_result(self, result: HotkeyResult) -> FeedbackMessage:
         """Return a user-facing message for a hotkey trigger result."""
         if not result.accepted:
+            if self._is_permission_error(result.message):
+                return self.for_platform_error(result.message, operation="hotkey")
             return FeedbackMessage(
                 level="warning",
                 text="Kısayol kullanılamıyor. F8 başka bir uygulama tarafından kullanılıyor olabilir.",
@@ -87,6 +89,71 @@ class FeedbackService:
             return self.for_stop_reason(stop_reason)
         return self.for_state(state)
 
+    def for_platform_error(
+        self,
+        error_message: str,
+        *,
+        operation: str = "generic",
+    ) -> FeedbackMessage:
+        """Return an action-oriented message for platform adapter failures."""
+        normalized = error_message.lower()
+        if self._is_permission_error(error_message):
+            if operation == "hotkey":
+                return FeedbackMessage(
+                    level="warning",
+                    text=(
+                        "macOS Input Monitoring izni gerekli olabilir. Sistem "
+                        "Ayarları > Gizlilik ve Güvenlik > Input Monitoring "
+                        "bölümünden uygulamaya izin verin."
+                    ),
+                )
+            if operation == "mouse":
+                return FeedbackMessage(
+                    level="warning",
+                    text=(
+                        "macOS Accessibility izni gerekli olabilir. Sistem "
+                        "Ayarları > Gizlilik ve Güvenlik > Accessibility "
+                        "bölümünden uygulamaya izin verin."
+                    ),
+                )
+            if "input monitoring" in normalized:
+                return FeedbackMessage(
+                    level="warning",
+                    text=(
+                        "macOS Input Monitoring izni gerekli olabilir. Sistem "
+                        "Ayarları > Gizlilik ve Güvenlik > Input Monitoring "
+                        "bölümünden uygulamaya izin verin."
+                    ),
+                )
+            if "accessibility" in normalized:
+                return FeedbackMessage(
+                    level="warning",
+                    text=(
+                        "macOS Accessibility izni gerekli olabilir. Sistem "
+                        "Ayarları > Gizlilik ve Güvenlik > Accessibility "
+                        "bölümünden uygulamaya izin verin."
+                    ),
+                )
+            return FeedbackMessage(
+                level="warning",
+                text=(
+                    "macOS Accessibility veya Input Monitoring izni gerekli "
+                    "olabilir. Sistem Ayarları > Gizlilik ve Güvenlik "
+                    "bölümünden uygulamaya izin verin."
+                ),
+            )
+
+        if self._is_unavailable_backend_error(error_message):
+            return FeedbackMessage(
+                level="error",
+                text="Bu platformda otomasyon backend'i kullanılamıyor.",
+            )
+
+        return FeedbackMessage(
+            level="error",
+            text=f"İşlem başlatılamadı: {error_message}",
+        )
+
     @staticmethod
     def _warning_reasons() -> set:
         return {
@@ -95,3 +162,23 @@ class FeedbackService:
             StopReason.TARGET_WINDOW_MISSING,
         }
 
+    @staticmethod
+    def _is_permission_error(error_message: str) -> bool:
+        normalized = error_message.lower()
+        return (
+            "accessibility" in normalized
+            or "input monitoring" in normalized
+            or "permission" in normalized
+            or "izin" in normalized
+        )
+
+    @staticmethod
+    def _is_unavailable_backend_error(error_message: str) -> bool:
+        normalized = error_message.lower()
+        return (
+            "not available" in normalized
+            or "not implemented" in normalized
+            or "unavailable" in normalized
+            or "api is not available" in normalized
+            or ("backend" in normalized and "kullanılamıyor" in normalized)
+        )
