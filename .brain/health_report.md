@@ -16,6 +16,8 @@ Gerekce:
 - macOS izin deneyimi urun diliyle netlestirildi.
 - Packaging stratejisi belirlendi.
 - Settings persistence tamamlandi.
+- TASK-028 ile Codebase Memory MCP PM Brain akisina dahil edildi; bu arac
+  degisikligi sprint veya release kapsam puanlarini etkilemedi.
 
 ## Test Count
 
@@ -72,6 +74,13 @@ Gerekce:
 ## Suggested New Tasks
 
 Yok.
+
+## Tooling Health
+
+- Codebase Memory MCP indeksi kullanilabilir.
+- MCP tek dogruluk kaynagi degildir; kaynak dosya dogrulamasi zorunludur.
+- MCP arizasinda yerel arama ve call-chain inceleme fallback'i tanimlidir.
+- Yerel indeks ve cache dosyalari Git kapsamindan harictir.
 
 ## Suggested Next Action
 

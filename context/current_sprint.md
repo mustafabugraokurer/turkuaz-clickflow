@@ -45,6 +45,7 @@ Yok.
 - TASK-025 - Packaging Strategy
 - TASK-026 - Settings Persistence
 - TASK-027 - macOS Permission UX Review
+- TASK-028 - Codebase Memory MCP PM Brain Entegrasyonu
 
 ### Todo
 
@@ -105,3 +106,10 @@ bulunamazsa otomasyon tiklama gondermeden durur.
 
 2026-07-06 QA Review tamamlandi. Blocker bug bulunmadi. Yeni kullanici
 dogrulamalari: settings persistence, window guard ve release artifact smoke.
+
+### PM Brain Arac Notu
+
+2026-07-13 tarihinde TASK-028 tamamlandi. Codebase Memory MCP kod kesfi,
+mimari analiz ve degisiklik etki analizinin ilk araci olarak PM Brain'e
+eklendi. MCP bulgularinin gercek kaynak dosyalardan dogrulanmasi zorunlu
+tutuldu; urun davranisi ve release kapsami degismedi.

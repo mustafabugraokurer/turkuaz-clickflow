@@ -49,6 +49,7 @@ Sprint-2: macOS readiness, izin deneyimi ve urunlesme hazirligi.
 - TASK-025 - Packaging Strategy
 - TASK-026 - Settings Persistence
 - TASK-027 - macOS Permission UX Review
+- TASK-028 - Codebase Memory MCP PM Brain Entegrasyonu
 
 ## Devam Eden / Kalan Sprint-1 Gorevleri
 
@@ -88,6 +89,15 @@ PYTHONPATH=src python3 -m unittest discover -s tests/unit
 ```
 
 Sonuc: 146 test basarili.
+
+## Gelistirme Araclari
+
+- Codebase Memory MCP kod kesfi, mimari analiz ve degisiklik etki analizinde
+  ilk arac olarak kullanilir.
+- MCP bulgulari degistirilecek gercek kaynak dosyalardan dogrulanir.
+- MCP kullanilamazsa `rg`, dogrudan dosya okuma ve import/call-chain
+  incelemesine geri donulur.
+- Yerel indeks, cache ve agent yapilandirma dosyalari commit edilmez.
 
 ## Sonraki Onerilen Task
 

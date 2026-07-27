@@ -1,5 +1,12 @@
 # Open Risks
 
+## Tooling Notu - Codebase Memory MCP
+
+Yeni release riski olusmadi. Bilgi grafiginin gecikmis veya eksik olmasi
+ihtimali, degistirilecek gercek kaynak dosyalarini dogrudan okuma zorunlulugu
+ve `rg`/import/call-chain fallback akisi ile kontrol altindadir. Yerel indeks ve
+cache dosyalari `.gitignore` kapsamindadir.
+
 ## RISK-002 - macOS Global Hotkey Eksik
 
 Durum: Azaltildi

@@ -32,6 +32,7 @@ Bu klasor tamamlanan gorevleri tutar. Her dosyanin basinda kapanis ozeti bulunma
 - TASK-025 - Packaging Strategy
 - TASK-026 - Settings Persistence
 - TASK-027 - macOS Permission UX Review
+- TASK-028 - Codebase Memory MCP PM Brain Entegrasyonu
 
 ## Son Test Durumu
 

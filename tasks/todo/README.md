@@ -14,6 +14,9 @@ Yok.
 
 Yok.
 
+TASK-028 Codebase Memory MCP PM Brain Entegrasyonu tamamlanarak `tasks/done/`
+altina tasindi; acik gelistirici task'i olusturmadi.
+
 ## Sprint-1 Disi / Opsiyonel
 
 Yok.

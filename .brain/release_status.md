@@ -13,6 +13,10 @@ Go
 Windows uzerinde uctan uca manuel smoke test Passed sonuc verdi ve BUG-002
 kapatildi. Ana release blockerlar kalmadi.
 
+TASK-028 ile yapilan Codebase Memory MCP entegrasyonu yalnizca gelistirme ve
+analiz akisini etkiler; urun davranisini, artifact'i veya mevcut Go kararini
+degistirmez.
+
 ## Go Icin Minimum Kosullar
 
 - Start / Stop / F8 / CPS / sayac / sure Windows ortaminda dogrulanmali. Passed
@@ -94,3 +98,4 @@ Gerekce:
 - TASK-026 - Settings Persistence
 - TASK-027 - macOS Permission UX Review
 - TASK-008 - Pencere Degisince Durdurma Davranisi
+- TASK-028 - Codebase Memory MCP PM Brain Entegrasyonu

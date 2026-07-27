@@ -64,14 +64,32 @@ Ciktilar:
 
 ## Her gorevden once oku
 
-- `prd/`
-- `.brain/`
-- `architecture/`
-- `design/`
-- `context/`
-- `tasks/`
-- `tests/manual/`
-- `tasks/user-tests/`
+Her gorevde zorunlu olarak yalnizca su kaynaklari oku:
+
+- `AGENTS.md`
+- `.brain/project_state.md`
+- `.brain/health_report.md`
+- Varsa ilgili task dosyasi
+
+`prd/`, `architecture/`, `design/`, `context/`, gecmis tasklar,
+`tests/manual/` ve `tasks/user-tests/` altindaki diger dosyalari yalnizca
+gorevle ilgiliyse oku veya ara.
+
+## Codebase Memory MCP Kullanim Kurallari
+
+- Kod kesfi, mimari analiz ve degisiklik etki analizinde once Codebase Memory
+  MCP bilgi grafigini kullan.
+- Sembol bulmak icin `search_graph`, cagri veya etki zinciri icin `trace_path`,
+  bulunan sembolun kodunu okumak icin `get_code_snippet`, karmasik iliski
+  sorgulari icin `query_graph`, genel mimari icin `get_architecture` kullan.
+- MCP sonucunu tek dogruluk kaynagi kabul etme. Degistirilecek gercek kaynak
+  dosyalarini dogrudan okuyarak sembol, davranis ve baglami dogrula.
+- MCP kullanilamiyorsa veya sonucu yetersizse `rg`, dogrudan dosya okuma ve
+  import/call-chain incelemesine geri don.
+- Indeksi kod yapisini etkileyen anlamli degisikliklerden sonra yenile.
+- `.codebase-memory/` altindaki yerel indeks/artifact dosyalarini, cache'leri
+  ve yerel agent yapilandirma dosyalarini repoya commit etme.
+- Ayrintili akis icin `context/codebase-memory-mcp.md` dosyasini kullan.
 
 ## Temel davranis
 

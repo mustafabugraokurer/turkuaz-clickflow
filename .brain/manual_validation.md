@@ -1,5 +1,11 @@
 # Manual Validation
 
+## Tooling Degisikligi
+
+TASK-028 yalnizca PM Brain ve gelistirme araci akisini degistirdi. Urun
+davranisi degismedigi icin yeni manuel kullanici testi veya smoke test
+gerektirmedi.
+
 ## Durum
 
 Manuel dogrulama sistemi PM Brain V2 ile ikiye ayrilir:
